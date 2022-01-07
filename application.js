@@ -1,4 +1,6 @@
+const { exec } = require('child_process');
 const fs = require('fs');
+const { config } = require('./config.json')
 
 if (fs.existsSync('./application_data.json')) {
 
@@ -33,7 +35,7 @@ fs.readFile('./application_data.json', 'utf8', (err, jsonString) => {
     );
 
     // 5 minute timer thing
-    var minutes = 5;
+    var minutes = 1;
     setInterval(function() {
         console.log("I am doing my 5 minutes check");
         // do your stuff here
@@ -50,8 +52,8 @@ fs.readFile('./application_data.json', 'utf8', (err, jsonString) => {
                 // Get the rows
                 const res = await service.spreadsheets.values.get({
                     auth: authClient,
-                    spreadsheetId: "1m05DvWgB5R8lcghH2seIiKTuDpVTQkFDeWkDrvkCBkI",
-                    range: "A:D",
+                    spreadsheetId: config.spreadsheetId,
+                    range: "A:D", // determines the colums to grab
                 });
         
                 // All of the answers
@@ -61,17 +63,28 @@ fs.readFile('./application_data.json', 'utf8', (err, jsonString) => {
                 const rows = res.data.values;
         
                 // Check if we have any data and if we do add it to our answers array
-                if (rows.length > application_data.checked) {
+                if (rows.length > application_data.checked+1) {
         
                     // Remove the headers
                     rows.shift();
-        
+
                     // For each row
-                    for (let i = application_data.checked; i <= rows.length; i++) {
+                    let executed = 0;
+                    for (let i = application_data.checked; i < rows.length; i++) {
                         // handle application
                         // this may be off by one or something, ill fix l8r
+                        executed++;
+                        // check always increases by the full length, prints 1 too many
+                        console.log(i);
                         console.log(rows[i]);
-                        i++
+                        if (i == rows.length-1) {
+                            application_data.checked += executed;
+                            fs.writeFile('./application_data.json', JSON.stringify(application_data), function writeJSON(err) {
+                                if (err) return console.log(err);
+                                console.log(JSON.stringify(application_data));
+                                console.log('writing to ./application_data.json');
+                              });
+                        }
                     }
         
                 } else {
