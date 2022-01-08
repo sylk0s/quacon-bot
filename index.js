@@ -3,7 +3,7 @@ const { Client, Collection, Intents, ReactionCollector } = require('discord.js')
 const { token } = require('./config.json');
 const app = require('./application.js');
 
-let Intss = new Intents(Intents.FLAGS.GUILDS)
+let Intss = new Intents([Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS])
 const bot = new Client({ intents: Intss });
 
 bot.commands = new Collection();
@@ -35,20 +35,12 @@ bot.on('interactionCreate', async interaction => {
 
 // temporary btw
 bot.on('messageReactionAdd', async (reaction, user) => {
-	console.log('reaction added')
-	if (user.bot | reaction.message.id in bot.apps1) {
-		console.log('passed checks')
-		if(reaction.partial) {
-			try {
-				console.log('checks for')
-				if (reaction.emoji == "🧇") {
-					reaction.message.channel.send('approved da thing')
-				}
-			} catch (error) {
-				console.error('Something went wrong: ', error);
-				return;
-			}
-		}
+	console.log('reaction added');
+	console.log(bot.apps1);
+	console.log(reaction.message.id);
+	if (!user.bot | reaction.message.id in bot.apps1) {
+		// fires after a reaction on any application messages
+		bot.channels.cache.get(reaction.message.channelId).send('reaction here')
 	}
 });
 
