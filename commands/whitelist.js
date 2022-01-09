@@ -27,7 +27,7 @@ module.exports = {
 			subcommand
 			.setName("temporary")
 			.setDescription("Add a User to the whitelist temporarily")
-			.addStringOption(option => option.setName('duration').setDescription('The duration of the whitelist').setRequired(true))
+			.addStringOption(option => option.setName('duration').setDescription('The duration of the whitelist. Format: format: `/\\d+(M|w|d|h|m)/`').setRequired(true))
 			.addStringOption(option => option.setName('mcname').setDescription('The minecraft username').setRequired(true))
 			.addUserOption(option => option.setName('target').setDescription('The user (optional)').setRequired(false))))
 	.addSubcommand(subcommand =>
@@ -51,7 +51,11 @@ module.exports = {
 	.addSubcommand(subcommand =>
 		subcommand
 		.setName('clear_expired_users')
-		.setDescription('Clear whitelist entries that have expired. TEMPORARY SOLUTION')),
+		.setDescription('Clear whitelist entries that have expired. TEMPORARY SOLUTION'))	
+	.addSubcommand(subcommand =>
+		subcommand
+		.setName('purge_temporary_whitelists')
+		.setDescription('Purge every temporary whitelist entry.')),
 		
 	async execute(interaction) {
 		var whitelist_type;
@@ -125,7 +129,7 @@ module.exports = {
 											break;
 										default:
 											console.log(duration, suffix, duration_string);
-											interaction.reply("Invalid duration string! Must be of the format: `\d+(M|w|d|h|m)`");
+											interaction.reply("Invalid duration string! Must be of the format: `/\\d+(M|w|d|h|m)/`");
 											return;
 									}
 									user_entry.expiration = new Date().getTime() + duration;
@@ -153,9 +157,7 @@ module.exports = {
 						whitelist[index] = user_entry;
 					});
 
-					console.log(whitelist);
 					whitelist = whitelist.filter(user_entry => user_entry.accounts.length > 0);
-					console.log(whitelist);
 					save_wl(whitelist);
 					if(JSON.stringify(whitelist) != prev_whitelist) {
 						interaction.reply(`Account ${interaction.options.getString('mcname')} removed successfully!`);
@@ -194,7 +196,6 @@ module.exports = {
 					var user = whitelist.find(account => 
 						account.discord_id == interaction.options.getUser('target').id
 					);
-					console.log(user);
 					
 					var description = `Whitelist profile for ${Formatters.userMention(user.discord_id)}`;
 					description += `\nUser type: ${user.type}`;
@@ -206,11 +207,10 @@ module.exports = {
 						text_body[index] = {};
 						text_body[index].name = account.name;
 						text_body[index].value = account.id + '\n';
-						text_body[index].value = AddDashesToUUID(account.id) + '\n';
+						text_body[index].value += AddDashesToUUID(account.id) + '\n';
 						text_body[index].value += "Added on: " + account.added_on.replace('T', ' ').substr(0, 19) + '\n';
 						text_body[index].value += "Added by: " + Formatters.userMention(account.added_by);
 					});
-					console.log(text_body);
 					
 					embed = new MessageEmbed()
 						.setColor('#ffffff')
@@ -223,14 +223,12 @@ module.exports = {
 
 				case 'export': // TEMPORARY SOLUTION
 					var exportable = [].concat.apply([], whitelist.map(u => u.accounts));
-					console.log(exportable);
 					exportable.forEach(a => {
 						delete a.added_by;
 						delete a.added_on;
 						a.id = AddDashesToUUID(a.id);
 					})
-					console.log(exportable);
-					interaction.reply(`\`${JSON.stringify(exportable)}\``);
+					interaction.reply(`\`\`\`${JSON.stringify(exportable)}\`\`\``);
 					break;
 
 				case 'clear_expired_users':
@@ -241,6 +239,13 @@ module.exports = {
 					}
 					interaction.reply(`Successfully cleared all expired whitelists. Cleared ${result_count} ${result_count == 1 ? 'entry' : 'entries'}.`);
 					
+				case 'purge_temporary_whitelists':
+					var result_count = whitelist.filter(u => u.type == 'temporary').length;
+					if(result_count > 0) {
+						whitelist = whitelist.filter(u => !(u.type == 'temporary'));
+						save_wl(whitelist);
+					}
+					interaction.reply(`Successfully cleared all temporary whitelists. Cleared ${result_count} ${result_count == 1 ? 'entry' : 'entries'}.`);
 			}
 		});
 	}
