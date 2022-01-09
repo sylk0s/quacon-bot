@@ -40,7 +40,14 @@ bot.on('messageReactionAdd', async (reaction, user) => {
 	console.log(reaction.message.id);
 	if (!user.bot | reaction.message.id in bot.apps1) {
 		// fires after a reaction on any application messages
-		bot.channels.cache.get(reaction.message.channelId).send('reaction here')
+		switch(reaction.emoji.name) {
+			case "🧇":
+				reaction.message.guild.channels.create("name" + "-app").then( channel => {
+					channel.setParent('918309600611160095');
+					channel.send('this channel has been created');
+				});
+				break;
+		}
 	}
 });
 
