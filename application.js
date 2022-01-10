@@ -1,5 +1,5 @@
 const fs = require('fs');
-const config = require('./config.json')
+const config = require('./config.json');
 
 const { google } = require("googleapis");
 
@@ -8,24 +8,25 @@ const credentials = require("./credentials.json");
 
 function checkForApps(bot) {
     console.log('Checking for apps now')
-    if (fs.existsSync('./application_data.json')) {
+    if (fs.existsSync('./appdata.json')) {
         // aaa
     } else {
-        let application_data = {
-            checked: 0
+        let appdata = {
+            checked: 0,
+            applications: [],
         };
 
-        let data = JSON.stringify(application_data);
-        fs.writeFileSync('application_data.json', data);
+        let data = JSON.stringify(appdata);
+        fs.writeFileSync('appdata.json', data);
     }
 
-    fs.readFile('./application_data.json', 'utf8', (err, jsonString) => {
+    fs.readFile('./appdata.json', 'utf8', (err, jsonString) => {
         if (err) {
             console.log("File read failed:", err)
             return
         } 
 
-        const application_data = JSON.parse(jsonString);
+        const appdata = JSON.parse(jsonString);
 
         // Configure auth client
         const authClient = new google.auth.JWT(
@@ -49,11 +50,11 @@ function checkForApps(bot) {
             
                     // Set the client credentials
                     authClient.setCredentials(token);
-            
+
                     // Get the rows
                     const res = await service.spreadsheets.values.get({
                         auth: authClient,
-                        spreadsheetId: "1m05DvWgB5R8lcghH2seIiKTuDpVTQkFDeWkDrvkCBkI",// burh config.spreadsheetId,
+                        spreadsheetId: config.spreadsheetID,
                         range: "A:D", // determines the colums to grab
                     });
             
@@ -64,17 +65,21 @@ function checkForApps(bot) {
                     const rows = res.data.values;
             
                     // Check if we have any data and if we do add it to our answers array
-                    if (rows.length > application_data.checked+1) {
+                    if (rows.length > appdata.checked+1) {
             
                         // Remove the headers
                         rows.shift();
 
                         // For each row
                         let executed = 0;
-                        for (let i = application_data.checked; i < rows.length; i++) {
+                        for (let i = appdata.checked; i < rows.length; i++) {
                             executed++;
                             console.log(i);
                             console.log(rows[i]);
+
+                            let app = parseJSONToApp(rows[i]);
+                            appdata.applications.push(app);
+                            fs.writeFileSync('./appdata.json', JSON.stringify(appdata));
                             // TODO
                             // this will post the application in the channel with a check reaction to confirm it's validity
                             // will parse into pdf as well
@@ -82,11 +87,11 @@ function checkForApps(bot) {
                             await message.react("🧇");
                             bot.apps1.push(message.id);
                             if (i == rows.length-1) {
-                                application_data.checked += executed;
-                                fs.writeFile('./application_data.json', JSON.stringify(application_data), function writeJSON(err) {
+                                appdata.checked += executed;
+                                fs.writeFile('./appdata.json', JSON.stringify(appdata), function writeJSON(err) {
                                     if (err) return console.log(err);
-                                    console.log(JSON.stringify(application_data));
-                                    console.log('writing to ./application_data.json');
+                                    console.log(JSON.stringify(appdata));
+                                    console.log('writing to ./appdata.json');
                                 });
                             }
                         }
@@ -114,12 +119,15 @@ function checkForApps(bot) {
 // called on new post
 function parseJSONToApp(appInput) {
     return application = {
-        applicant: "", // discord name for applicant (ID?)
-        startTime: "", // time form is submitted
-        confirmed: "", // approved for consideration
-        approved: "", // approved for intern
+        applicant: appInput[1], // discord name for applicant (ID?)
+        startTime: appInput[0], // time form is submitted
+        messageID:"",
+        confirmed: false, // approved for consideration
+        confirmedBy:"",
+        approved: false, // approved for intern
+        approvedBy:"",
         appChannel: "", // id for application channel
-        appDiscussion: "", // id for discussion channel
+        appDiscussionChannel: "", // id for discussion channel
         endTime: "", // time application is finished
         voteID: "", // id for the vote message - will also use as unique id for votes
     }

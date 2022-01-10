@@ -1,6 +1,6 @@
 const fs = require('fs');
 const { Client, Collection, Intents, ReactionCollector } = require('discord.js');
-const { token } = require('./config.json');
+const config = require('./config.json');
 const app = require('./application.js');
 
 let Intss = new Intents([Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS])
@@ -51,6 +51,6 @@ bot.on('messageReactionAdd', async (reaction, user) => {
 	}
 });
 
-bot.login(token);
+bot.login(config.token);
 
 app.checkForApps(bot);
