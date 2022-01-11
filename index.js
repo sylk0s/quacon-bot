@@ -33,7 +33,7 @@ bot.on('interactionCreate', async interaction => {
 	}
 });
 
-// temporary btw
+// temporary btw, redo better later
 bot.on('messageReactionAdd', async (reaction, user) => {
 	console.log('reaction added');
 	console.log(bot.apps1);

@@ -1,4 +1,5 @@
 const fs = require('fs');
+const fsp = require('fs').promises;
 const config = require('./config.json');
 
 const { google } = require("googleapis");
@@ -6,6 +7,7 @@ const { google } = require("googleapis");
 const service = google.sheets("v4");
 const credentials = require("./credentials.json");
 
+// Runs in the background checking for new applications every x mintues
 function checkForApps(bot) {
     console.log('Checking for apps now')
     if (fs.existsSync('./appdata.json')) {
@@ -37,17 +39,7 @@ function checkForApps(bot) {
         (async function () {
             try {
 
-                let string = ""; 
-
-                fs.readFile('./appdata.json', 'utf8', (err, jsonString) => {
-                    if (err) {
-                        console.log("File read failed:", err)
-                        return
-                    } else {
-                        string = jsonString;
-                    }
-                })
-                
+                const string = fs.readFileSync('./appdata.json',{encoding: 'utf8', flag:'r'});
                 const appdata = JSON.parse(string);
         
                 // Authorize the client
@@ -67,7 +59,7 @@ function checkForApps(bot) {
                 const answers = [];
         
                 // Set rows to equal the rows
-                const rows = await res.data.values;
+                const rows = res.data.values;
             
                 // Check if we have any data and if we do add it to our answers array
                 if (rows.length > appdata.checked+1) {
@@ -83,20 +75,15 @@ function checkForApps(bot) {
                         console.log(rows[i]);
                            
                         const message = await bot.channels.cache.get('927417403997040651').send('Detected ' + rows[i][1])
-                        await message.react("🧇");
+                        await message.react("🧇"); // maybe make this something better soontm
                         bot.apps1.push(message.id);
-                        if (i == rows.length-1) {
-                            appdata.checked += executed;
-                            fs.writeFile('./appdata.json', JSON.stringify(appdata), function writeJSON(err) {
-                                if (err) return console.log(err);
-                                console.log(JSON.stringify(appdata));
-                                console.log('writing to ./appdata.json');
-                            });
-                        }
                         let app = parseJSONToApp(rows[i]);
                         app.messageID = message.id;
                         appdata.applications.push(app);
-                        fs.writeFileSync('./appdata.json', JSON.stringify(appdata));
+                        if (i == rows.length-1) {
+                            appdata.checked += executed;
+                            fs.writeFileSync('./appdata.json', JSON.stringify(appdata));
+                        }
                     }
             
                 } else {
@@ -115,7 +102,8 @@ function checkForApps(bot) {
             
         })();
 
-    }, minutes * 60 * 1000);
+    }, minutes * 30 * 1000); // remember to change this back later :)
+
     
 }
 
@@ -124,11 +112,11 @@ function parseJSONToApp(appInput) {
     return application = {
         applicant: appInput[1], // discord name for applicant (ID?)
         startTime: appInput[0], // time form is submitted
-        messageID:"",
+        messageID:"", // Id for the main message
         confirmed: false, // approved for consideration
-        confirmedBy:"",
+        confirmedBy:"", // ID of person who confirmed the app
         approved: false, // approved for intern
-        approvedBy:"",
+        approvedBy:"", // ID of person who approved the app
         appChannel: "", // id for application channel
         appDiscussionChannel: "", // id for discussion channel
         endTime: "", // time application is finished
@@ -146,31 +134,30 @@ function approveApplication(id, c1, c2, confirmedBy) {
     let index = getApplicationIndexFromID(id);
     let apps = require('./appdata.json');
     let app = apps.applications[index];
-    app.confirmedBy = approvedBy;
+    app.confirmedBy = confirmedBy;
     app.confirmed = true;
-    appChannel = c1;
-    appDiscussionChannel = c2;
+    app.appChannel = c1;
+    app.appDiscussionChannel = c2;
     fs.writeFileSync('./appdata.json', JSON.stringify(apps));
 }
 
+// Uses message id to get the applications index from the application list
 function getApplicationIndexFromID(id) {
     let apps = require('./appdata.json');
-    for (let i = 0; i > apps.applications.length; i++) { //(application in apps.applications) {
-        if (apps.applications[i].id == id) {
+    for (let i = 0; i < apps.applications.length; i++) { //(application in apps.applications) {
+        if (apps.applications[i].messageID == id) {
             return i;
         }
     }
 }
 
+// Creates the vote using linking and the app object
 function createApplicationVote() {
 
 }
 
+// Confirms membership for an incoming applicant
 function confirmMembership() {
-
-}
-
-function getFunctionFromReaction() {
 
 }
 
