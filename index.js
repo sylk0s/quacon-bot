@@ -45,6 +45,7 @@ bot.on('messageReactionAdd', async (reaction, user) => {
 				reaction.message.guild.channels.create("name" + "-app").then( channel => {
 					channel.setParent('918309600611160095');
 					channel.send('this channel has been created');
+					app.approveApplication(reaction.message.id, channel.id, '0', user.id);
 				});
 				break;
 		}
