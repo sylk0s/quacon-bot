@@ -33,20 +33,9 @@ bot.on('interactionCreate', async interaction => {
 	}
 });
 
-// temporary btw, redo better later
-// actually i want to move this into application.js later
 bot.on('messageReactionAdd', async (reaction, user) => {
-	if (!user.bot | reaction.message.id in bot.apps1) {
-		// fires after a reaction on any application messages
-		switch(reaction.emoji.name) {
-			case "🧇":
-				reaction.message.guild.channels.create("name" + app.getAppNameFromID(reaction.message.id) ).then( channel => {
-					channel.setParent(app.getAppCategory());
-					channel.send('this channel has been created');
-					app.approveApplication(reaction.message.id, channel.id, '0', user.id);
-				});
-				break;
-		}
+	if (!user.bot | app.appExists(reaction.message.id)) {
+		app.handleReaction(reaction, user);
 	}
 });
 

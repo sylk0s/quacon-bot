@@ -13,10 +13,15 @@ function checkForApps(bot) {
     if (fs.existsSync('./appdata.json')) {
         // aaa
     } else {
+        // stupid issue storing emojis in json bruh
         let appdata = {
             checked: 0,
             appCategory:'',
             newAppChannel:'',
+            confirmEmote:"✅",
+            voteEmote:"🇻",
+            memberEmote:"🇲",
+            denyEmote:"❌",
             applications: [],
         };
 
@@ -73,10 +78,10 @@ function checkForApps(bot) {
                     let executed = 0;
                     for (let i = appdata.checked; i < rows.length; i++) {
                         executed++;
-                           
                         const message = await bot.channels.cache.get(getAppChannel()).send('Detected ' + rows[i][1])
-                        await message.react("🧇"); // maybe make this something better soontm
-                        bot.apps1.push(message.id);
+                        
+                        await message.react('✅');
+                        await message.react('❌');
                         let app = parseJSONToApp(rows[i]);
                         app.messageID = message.id;
                         appdata.applications.push(app);
@@ -85,26 +90,17 @@ function checkForApps(bot) {
                             fs.writeFileSync('./appdata.json', JSON.stringify(appdata));
                         }
                     }
-            
                 } else {
                     console.log("No new data found.");  
                 }
             
             } catch (error) {
-            
-                    // Log the error
                 console.log(error);
-            
                     // Exit the process with error
                 process.exit(1);
-            
-            }
-            
+            }    
         })();
-
-    }, minutes * 30 * 1000); // remember to change this back later :)
-
-    
+    }, minutes * 30 * 1000); // remember to change this back later :)  
 }
 
 // Creates JS object
@@ -181,4 +177,45 @@ function getAppNameFromID(id) {
     return appConf.applications[getApplicationIndexFromID(id)].applicant;
 }
 
-module.exports = { checkForApps, approveApplication, getAppCategory, getAppNameFromID };
+function appExists(id) {
+    if (typeof getApplicationIndexFromID(id) === 'undefined') {
+        return false;
+    }
+    return true;
+}
+
+function handleReaction(reaction, user) {
+    let data = fs.readFileSync('appdata.json');
+    let appConf = JSON.parse(data);
+
+    switch(reaction.emoji.name) {
+        // Approve initial application
+        case ('✅'):
+            let c1 = '';
+            let c2 = ''; 
+            reaction.message.guild.channels.create(getAppNameFromID(reaction.message.id) + "-application" ).then( channel => {
+                channel.setParent(getAppCategory());
+                c1 = channel.id;
+            });
+            reaction.message.guild.channels.create(getAppNameFromID(reaction.message.id) + "-discussion" ).then( channel => {
+                channel.setParent(getAppCategory());
+                c2 = channel.id;
+            });
+            approveApplication(reaction.message.id, c1, c2, user.id);
+            break;
+        
+        // Create application vote
+        case ('🇻'):
+            break;
+        
+        // Approve for archive and membership
+        case ('🇲'):
+            break;
+
+        // deny and wipe application record
+        case ('❌'):
+            break;
+    }
+}
+
+module.exports = { checkForApps, appExists, handleReaction };
