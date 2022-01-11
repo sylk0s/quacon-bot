@@ -15,6 +15,8 @@ function checkForApps(bot) {
     } else {
         let appdata = {
             checked: 0,
+            appCategory:'',
+            newAppChannel:'',
             applications: [],
         };
 
@@ -74,7 +76,7 @@ function checkForApps(bot) {
                         console.log(i);
                         console.log(rows[i]);
                            
-                        const message = await bot.channels.cache.get('927417403997040651').send('Detected ' + rows[i][1])
+                        const message = await bot.channels.cache.get(getAppChannel()).send('Detected ' + rows[i][1])
                         await message.react("🧇"); // maybe make this something better soontm
                         bot.apps1.push(message.id);
                         let app = parseJSONToApp(rows[i]);
@@ -145,6 +147,7 @@ function approveApplication(id, c1, c2, confirmedBy) {
 function getApplicationIndexFromID(id) {
     let apps = require('./appdata.json');
     for (let i = 0; i < apps.applications.length; i++) { //(application in apps.applications) {
+        console.log(apps.applications[i]);
         if (apps.applications[i].messageID == id) {
             return i;
         }
@@ -161,4 +164,21 @@ function confirmMembership() {
 
 }
 
-module.exports = { checkForApps, approveApplication };
+function getAppCategory() {
+    let appConf = require('./appdata.json');
+    return appConf.appCategory;
+}
+
+function getAppChannel() {
+    let appConf = require('./appdata.json');
+    return appConf.newAppChannel;
+}
+
+function getAppNameFromID(id) {
+    // for some reason this isnt reading the newest version of this?
+    let appConf = require('./appdata.json');
+    console.log(getApplicationIndexFromID(id));
+    return appConf.applications[getApplicationIndexFromID(id)].applicant;
+}
+
+module.exports = { checkForApps, approveApplication, getAppCategory, getAppNameFromID };
