@@ -73,8 +73,6 @@ function checkForApps(bot) {
                     let executed = 0;
                     for (let i = appdata.checked; i < rows.length; i++) {
                         executed++;
-                        console.log(i);
-                        console.log(rows[i]);
                            
                         const message = await bot.channels.cache.get(getAppChannel()).send('Detected ' + rows[i][1])
                         await message.react("🧇"); // maybe make this something better soontm
@@ -134,7 +132,8 @@ function parseJSONToImage(appInput) {
 // Approves application for useage
 function approveApplication(id, c1, c2, confirmedBy) {
     let index = getApplicationIndexFromID(id);
-    let apps = require('./appdata.json');
+    let data = fs.readFileSync('appdata.json');
+    let apps = JSON.parse(data);
     let app = apps.applications[index];
     app.confirmedBy = confirmedBy;
     app.confirmed = true;
@@ -145,9 +144,9 @@ function approveApplication(id, c1, c2, confirmedBy) {
 
 // Uses message id to get the applications index from the application list
 function getApplicationIndexFromID(id) {
-    let apps = require('./appdata.json');
+    let data = fs.readFileSync('appdata.json');
+    let apps = JSON.parse(data);
     for (let i = 0; i < apps.applications.length; i++) { //(application in apps.applications) {
-        console.log(apps.applications[i]);
         if (apps.applications[i].messageID == id) {
             return i;
         }
@@ -165,19 +164,20 @@ function confirmMembership() {
 }
 
 function getAppCategory() {
-    let appConf = require('./appdata.json');
+    let data = fs.readFileSync('appdata.json');
+    let appConf = JSON.parse(data);
     return appConf.appCategory;
 }
 
 function getAppChannel() {
-    let appConf = require('./appdata.json');
+    let data = fs.readFileSync('appdata.json');
+    let appConf = JSON.parse(data);
     return appConf.newAppChannel;
 }
 
 function getAppNameFromID(id) {
-    // for some reason this isnt reading the newest version of this?
-    let appConf = require('./appdata.json');
-    console.log(getApplicationIndexFromID(id));
+    let data = fs.readFileSync('appdata.json');
+    let appConf = JSON.parse(data);
     return appConf.applications[getApplicationIndexFromID(id)].applicant;
 }
 

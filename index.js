@@ -36,9 +36,6 @@ bot.on('interactionCreate', async interaction => {
 // temporary btw, redo better later
 // actually i want to move this into application.js later
 bot.on('messageReactionAdd', async (reaction, user) => {
-	console.log('reaction added');
-	console.log(bot.apps1);
-	console.log(reaction.message.id);
 	if (!user.bot | reaction.message.id in bot.apps1) {
 		// fires after a reaction on any application messages
 		switch(reaction.emoji.name) {
