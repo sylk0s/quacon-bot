@@ -80,8 +80,10 @@ function checkForApps(bot) {
                         executed++;
                         const message = await bot.channels.cache.get(getAppChannel()).send('Detected ' + rows[i][1])
                         
-                        await message.react('✅');
-                        await message.react('❌');
+                        console.log(appdata.confirmEmote);
+
+                        await message.react(appdata.confirmEmote);
+                        await message.react(appdata.denyEmote);
                         let app = parseJSONToApp(rows[i]);
                         app.messageID = message.id;
                         appdata.applications.push(app);
@@ -100,7 +102,7 @@ function checkForApps(bot) {
                 process.exit(1);
             }    
         })();
-    }, minutes * 30 * 1000); // remember to change this back later :)  
+    }, minutes * 10 * 1000); // remember to change this back later :)  
 }
 
 // Creates JS object
@@ -190,7 +192,7 @@ function handleReaction(reaction, user) {
 
     switch(reaction.emoji.name) {
         // Approve initial application
-        case ('✅'):
+        case (appConf.confirmEmote):
             let c1 = '';
             let c2 = ''; 
             reaction.message.guild.channels.create(getAppNameFromID(reaction.message.id) + "-application" ).then( channel => {
@@ -205,15 +207,15 @@ function handleReaction(reaction, user) {
             break;
         
         // Create application vote
-        case ('🇻'):
+        case (appConf.voteEmote):
             break;
         
         // Approve for archive and membership
-        case ('🇲'):
+        case (appConf.memberEmote):
             break;
 
         // deny and wipe application record
-        case ('❌'):
+        case (appConf.denyEmote ):
             break;
     }
 }
