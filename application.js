@@ -79,9 +79,6 @@ function checkForApps(bot) {
                     for (let i = appdata.checked; i < rows.length; i++) {
                         executed++;
                         const message = await bot.channels.cache.get(getAppChannel()).send('Detected ' + rows[i][1])
-                        
-                        console.log(appdata.confirmEmote);
-
                         await message.react(appdata.confirmEmote);
                         await message.react(appdata.denyEmote);
                         let app = parseJSONToApp(rows[i]);
@@ -197,25 +194,26 @@ function handleReaction(reaction, user) {
             let c2 = ''; 
             reaction.message.guild.channels.create(getAppNameFromID(reaction.message.id) + "-application" ).then( channel => {
                 channel.setParent(getAppCategory());
-                c1 = channel.id;
+                reaction.message.guild.channels.create(getAppNameFromID(reaction.message.id) + "-discussion" ).then( channel2 => {
+                    channel2.setParent(getAppCategory());
+                    approveApplication(reaction.message.id, channel.id, channel2.id, user.id);
+                });
             });
-            reaction.message.guild.channels.create(getAppNameFromID(reaction.message.id) + "-discussion" ).then( channel => {
-                channel.setParent(getAppCategory());
-                c2 = channel.id;
-            });
-            approveApplication(reaction.message.id, c1, c2, user.id);
             break;
         
         // Create application vote
         case (appConf.voteEmote):
+
             break;
         
         // Approve for archive and membership
         case (appConf.memberEmote):
+
             break;
 
         // deny and wipe application record
-        case (appConf.denyEmote ):
+        case (appConf.denyEmote):
+
             break;
     }
 }
