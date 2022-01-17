@@ -1,6 +1,6 @@
 const fs = require('fs');
 const { Client, Collection, Intents, ReactionCollector } = require('discord.js');
-const { token } = require('./config.json');
+const config = require('./config.json');
 const app = require('./application.js');
 
 let Intss = new Intents([Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS])
@@ -33,17 +33,12 @@ bot.on('interactionCreate', async interaction => {
 	}
 });
 
-// temporary btw
 bot.on('messageReactionAdd', async (reaction, user) => {
-	console.log('reaction added');
-	console.log(bot.apps1);
-	console.log(reaction.message.id);
-	if (!user.bot | reaction.message.id in bot.apps1) {
-		// fires after a reaction on any application messages
-		bot.channels.cache.get(reaction.message.channelId).send('reaction here')
+	if (!user.bot | app.appExists(reaction.message.id)) {
+		app.handleReaction(reaction, user);
 	}
 });
 
-bot.login(token);
+bot.login(config.token);
 
 app.checkForApps(bot);
