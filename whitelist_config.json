@@ -1,0 +1,18 @@
+{
+    "smp": {
+        "names": ["smp", "survival"],
+        "op": false
+    },
+    "cmp": {
+        "names": ["cmp", "creative"],
+        "op": true
+    },
+    "cmp2": {
+        "names": ["cmp2", "creative2"],
+        "op": true
+    },
+    "copy": {
+        "names": ["copy", "smpcopy", "survivalcopy"],
+        "op": true
+    }
+}
