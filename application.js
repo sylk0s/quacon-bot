@@ -92,6 +92,9 @@ function checkForApps(bot) {
                 } else {
                     console.log("No new data found.");  
                 }
+            // add more stuff here
+
+
             
             } catch (error) {
                 console.log(error);
