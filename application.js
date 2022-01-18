@@ -102,7 +102,7 @@ function checkForApps(bot) {
                 process.exit(1);
             }    
         })();
-    }, minutes * 10 * 1000); // remember to change this back later :)  
+    }, minutes * 60 * 1000); // remember to change this back later :)  
 }
 
 // Creates JS object
