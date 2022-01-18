@@ -1,4 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const { MessageEmbed } = require('discord.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -7,9 +8,17 @@ module.exports = {
 		.addStringOption(option => option.setName('message_id').setDescription('Message id').setRequired(true)),
 	async execute(interaction) {
 		id = interaction.options.getString('message_id');
-		interaction.channel.messages.fetch(id).then(message => {	
-			message.pin()
-			interaction.reply('Pinned!');
-		});
-	},
+		try {
+			await interaction.channel.messages.fetch(id).then(message => {	
+				message.pin()
+				interaction.reply('Pinned!');
+			});
+		} catch(error) {
+			embed = new MessageEmbed()
+					.setColor('#ff3333')
+					.setTitle(`Error!`)
+					.setDescription(error.toString());
+			interaction.reply({ embeds: [embed] });
+		}
+	}
 };
