@@ -2,6 +2,7 @@ const fs = require('fs');
 const { Client, Collection, Intents, ReactionCollector } = require('discord.js');
 const config = require('./config.json');
 const app = require('./application.js');
+const voteHandler = require('./commands/vote.js')
 
 let Intss = new Intents([Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS])
 const bot = new Client({ intents: Intss });
@@ -42,3 +43,4 @@ bot.on('messageReactionAdd', async (reaction, user) => {
 bot.login(config.token);
 
 app.checkForApps(bot);
+voteHandler.queryVotes(bot);

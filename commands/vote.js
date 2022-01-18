@@ -38,24 +38,16 @@ module.exports = {
                 let now = new Date();
                 let future = new Date(); // 3 days in ms
                 future.setMilliseconds(future.getMilliseconds() + hours*60*60*1000 + minutes*60*1000);
-                let milliseconds = future-now;
 
                 let vote = createVote(
                     interaction.options.getString('name'),
                     interaction.options.getString('description'),
                     hours,
                     minutes,
-                    milliseconds,
                     now,
                     future);
 
                 // start the timer
-
-                setTimeout(function () { 
-
-                    interaction.reply('vote finished')
-
-                } , vote.runtime)
 
                 vote.messageID = await postVote(vote, interaction);
 
@@ -64,6 +56,7 @@ module.exports = {
                 fs.writeFileSync('./votes.json', JSON.stringify(votes));
                 break;
 
+            // broken atm
             case ('list'):
                 const embed = new MessageEmbed().setColor('#55ff55').setTitle('Current Votes:').setTimestamp();
 
@@ -80,22 +73,22 @@ module.exports = {
                 for (let i = 0; i < votes.votes.length; i++) {
                     if (votes.votes[i].name == interaction.options.getString('vote')) {
                         votes.votes.splice(i--, 1);
+                        await interaction.message.channel.fetchMessage(votes.votes[i].messageID).delete();
+
                     }
                 }
-
-                // delete message and reply
 
                 fs.writeFileSync('./votes.json', JSON.stringify(votes));
                 break;
         }
 	},
+    queryVotes
 };
 
-function createVote(name, description, hours, minutes,ms, now, future) {
+function createVote(name, description, hours, minutes, now, future) {
     return {
         endTime:future,
         startTime:now,
-        runtime:ms,
         name:name,
         description:description,
         hours:hours,
@@ -121,6 +114,52 @@ async function postVote(vote, interaction) {
     return message.id; //message ID
 }
 
-function initializeVotes() {
+// this is bad but it wrote it this way so the vote command is decoupled from the logic
+function queryVotes(bot) {
+    console.log("starting vote query")
+    setInterval(function() {
+        console.log('i am checking the votes');
+        let data = fs.readFileSync('votes.json');
+        let votes = JSON.parse(data);
+        let toDelete = [];
+        for(let i = 0; i < votes.votes.length; i++) {
+            let vote = votes.votes[i];
+            const end = Date.parse(vote.endTime)
+            const now = new Date();
+            if(end-now < 0) {
+                toDelete.push(vote.messageID);
+            }
+        }
+        // this second loop removes any looping errors I had
+        for(let j = 0; j < toDelete.length; j++) {
+            for(let i = 0; i < votes.votes.length; i++) {
+                if(votes.votes[i].messageID == toDelete[j]) {
+                    endVote(i, bot);
+                }
+            }
+        }
+    }, 10 * 1000) // 
+}
 
+function endVote(i, bot) {
+    let data = fs.readFileSync('votes.json');
+    let votes = JSON.parse(data);
+    let vote = votes.votes[i];
+
+    const exampleEmbed = new MessageEmbed()
+                        .setColor('#ff0000') //  variable color
+                        .setTitle(vote.name) // help
+                        .setDescription(vote.description)
+                        .addFields(
+                            { name: 'Results', value: "Vote finished add more in a second" },
+                        )
+                        .setTimestamp()
+
+    bot.channels.cache.get('927417403997040651').messages.fetch(vote.messageID).then((msg) => {
+        msg.edit({embeds: [exampleEmbed]});
+      });
+
+      votes.votes.splice(i--, 1);
+
+    fs.writeFileSync('./votes.json', JSON.stringify(votes));
 }
