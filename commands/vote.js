@@ -51,7 +51,6 @@ module.exports = {
                     now,
                     future);
 
-                    // now this doesnt work oof
                 vote.messageID = await postVote2(vote, interaction);
                 votes.votes.push(vote);
                 fs.writeFileSync('./votes.json', JSON.stringify(votes));
@@ -86,12 +85,10 @@ module.exports = {
             case ('force'):
                 for (let i = 0; i < votes.votes.length; i++) {
                     if (votes.votes[i].name == interaction.options.getString('vote')) {
-                        let vote = votes.votes[i];
-                        // this doesnt work lol dont think i grabs the bot
+                        await interaction.reply({ content: 'Forced the end of ' + votes.votes[i].name , ephemeral: true });
                         endVote(i, interaction.client);
                     }
                 }
-                fs.writeFileSync('./votes.json', JSON.stringify(votes));
                 break;
         }
 	},
@@ -232,8 +229,10 @@ function endVote(i, bot) {
         msg.edit({embeds: [exampleEmbed]});
 
         // it be broken
-        const app = require('../application.js');
-        app.updateFromVote(vote.appID, yesVote>=noVote);
+        if(vote.application) {
+            const app = require('../application.js');
+            app.updateFromVote(vote.appID, yesVote>=noVote);
+        }
       });
 
       votes.votes.splice(i--, 1);

@@ -149,7 +149,7 @@ function getApplicationIndexFromID(id) {
 
 // Confirms membership for an incoming applicant
 function confirmMembership(id) {
-
+    console.log('confiming membership');
 }
 
 function getAppCategory() {
@@ -223,7 +223,7 @@ function updateFromVote(id, passed) {
 }
 
 function cleanup(id) {
-
+    console.log('cleaning up');
 }
 
 module.exports = { checkForApps, appExists, handleReaction, updateFromVote };
