@@ -56,28 +56,30 @@ module.exports = {
                 fs.writeFileSync('./votes.json', JSON.stringify(votes));
                 break;
 
-            // broken atm
             case ('list'):
+
                 const embed = new MessageEmbed().setColor('#55ff55').setTitle('Current Votes:').setTimestamp();
 
-                for (i in votes.votes.length) {
+                for (let i = 0; i < votes.votes.length; i++) {
                     embed.addFields(
                         { name: votes.votes[i].name, value: votes.votes[i].description },
-                    )
+                    );
                 }
 
                 interaction.reply({ embeds: [embed]});
                 break;
 
+            // this is also broken lol
+            // this should also break if its in the wrong channel upsi
             case ('delete'):
                 for (let i = 0; i < votes.votes.length; i++) {
                     if (votes.votes[i].name == interaction.options.getString('vote')) {
+                        let vote = votes.votes[i];
                         votes.votes.splice(i--, 1);
-                        await interaction.message.channel.fetchMessage(votes.votes[i].messageID).delete();
-
+                        await interaction.channel.messages.fetch(vote.messageID).then(msg => msg.delete());
+                        await interaction.reply({ content: 'Deleted ' + vote.name , ephemeral: true });
                     }
                 }
-
                 fs.writeFileSync('./votes.json', JSON.stringify(votes));
                 break;
         }
@@ -99,7 +101,7 @@ function createVote(name, description, hours, minutes, now, future) {
 
 async function postVote(vote, interaction) {
     const exampleEmbed = new MessageEmbed()
-                        .setColor('#55ff55')
+                        .setColor('#ffff00')
                         .setTitle(vote.name)
                         .setDescription(vote.description)
                         // do better here with the endtype printout
@@ -111,6 +113,10 @@ async function postVote(vote, interaction) {
     await interaction.reply({ embeds: [exampleEmbed]});
     let message = await interaction.fetchReply();
     
+    await message.react('👍');
+    await message.react('👎');
+    await message.react('✋');
+
     return message.id; //message ID
 }
 
@@ -146,16 +152,33 @@ function endVote(i, bot) {
     let votes = JSON.parse(data);
     let vote = votes.votes[i];
 
-    const exampleEmbed = new MessageEmbed()
-                        .setColor('#ff0000') //  variable color
+    bot.channels.cache.get('927417403997040651').messages.fetch(vote.messageID).then((msg) => {
+
+        // count reactions and handle voting
+
+        const reactions = msg.reactions.cache;
+        let yesVote = reactions.get('👍').count-1;
+        let noVote = reactions.get('👎').count-1;
+        let abstain = reactions.get('✋').count-1;
+
+        msg.reactions.removeAll();
+
+        const exampleEmbed = new MessageEmbed()
                         .setTitle(vote.name) // help
                         .setDescription(vote.description)
-                        .addFields(
-                            { name: 'Results', value: "Vote finished add more in a second" },
-                        )
+                        .addFields( { name: 'Yes', value: String(yesVote), inline: true },)
+                        .addFields( { name: 'No', value: String(noVote), inline: true },)
+                        .addFields( { name: 'Abstain', value: String(abstain), inline: true },)
                         .setTimestamp()
+        
+        if (yesVote >= noVote) {
+            exampleEmbed.setColor('#55ff55')
+            .addFields( { name: 'Result:', value: 'Passed!' }, );
+        } else {
+            exampleEmbed.setColor('#ff0000')
+            .addFields( { name: 'Result:', value: 'Failed :(' }, );
+        }
 
-    bot.channels.cache.get('927417403997040651').messages.fetch(vote.messageID).then((msg) => {
         msg.edit({embeds: [exampleEmbed]});
       });
 
