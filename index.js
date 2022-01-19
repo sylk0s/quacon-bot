@@ -35,7 +35,7 @@ bot.on('interactionCreate', async interaction => {
 });
 
 bot.on('messageReactionAdd', async (reaction, user) => {
-	if (!user.bot | app.appExists(reaction.message.id)) {
+	if (!user.bot && app.appExists(reaction.message.id)) {
 		app.handleReaction(reaction, user);
 	}
 });

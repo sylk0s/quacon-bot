@@ -19,7 +19,11 @@ module.exports = {
         .addSubcommand(subcommand => subcommand
             .setName("delete")
             .setDescription("Delete a vote")
-            .addStringOption(option => option.setName('vote').setDescription('Name of the vote to delete').setRequired(true))),
+            .addStringOption(option => option.setName('vote').setDescription('Name of the vote to delete').setRequired(true)))
+        .addSubcommand(subcommand => subcommand
+            .setName("force")
+            .setDescription("Force a vote to end")
+            .addStringOption(option => option.setName('vote').setDescription('Name of the vote to force').setRequired(true))),
 	async execute(interaction) {
 
         let data = fs.readFileSync('votes.json');
@@ -47,12 +51,9 @@ module.exports = {
                     now,
                     future);
 
-                // start the timer
-
-                vote.messageID = await postVote(vote, interaction);
-
+                    // now this doesnt work oof
+                vote.messageID = await postVote2(vote, interaction);
                 votes.votes.push(vote);
-
                 fs.writeFileSync('./votes.json', JSON.stringify(votes));
                 break;
 
@@ -69,7 +70,6 @@ module.exports = {
                 interaction.reply({ embeds: [embed]});
                 break;
 
-            // this is also broken lol
             // this should also break if its in the wrong channel upsi
             case ('delete'):
                 for (let i = 0; i < votes.votes.length; i++) {
@@ -82,9 +82,20 @@ module.exports = {
                 }
                 fs.writeFileSync('./votes.json', JSON.stringify(votes));
                 break;
+
+            case ('force'):
+                for (let i = 0; i < votes.votes.length; i++) {
+                    if (votes.votes[i].name == interaction.options.getString('vote')) {
+                        let vote = votes.votes[i];
+                        // this doesnt work lol dont think i grabs the bot
+                        endVote(i, interaction.client);
+                    }
+                }
+                fs.writeFileSync('./votes.json', JSON.stringify(votes));
+                break;
         }
 	},
-    queryVotes
+    queryVotes, saveApplicationVote
 };
 
 function createVote(name, description, hours, minutes, now, future) {
@@ -96,10 +107,26 @@ function createVote(name, description, hours, minutes, now, future) {
         hours:hours,
         minutes:minutes,
         messageID:"",
+        application:false,
+        appID:"",
     }
 }
 
-async function postVote(vote, interaction) {
+async function saveApplicationVote(applicant, link, msg) {
+    let data = fs.readFileSync('votes.json');
+    let votes = JSON.parse(data);
+    let now = new Date();
+    let future = new Date();
+    future.setMilliseconds(future.getMilliseconds() + 72*60*60*1000);
+    let vote = createVote(applicant, "description", 72, 0, now, future);
+    vote.messageID = await postVote(vote, msg);
+    vote.application = true;
+    vote.appID = msg.id;
+    votes.votes.push(vote);
+    fs.writeFileSync('./votes.json', JSON.stringify(votes));
+}
+
+async function postVote(vote, msg) {
     const exampleEmbed = new MessageEmbed()
                         .setColor('#ffff00')
                         .setTitle(vote.name)
@@ -109,10 +136,33 @@ async function postVote(vote, interaction) {
                             { name: 'Ends at:', value: String(vote.endTime) },
                         )
                         .setTimestamp()
-                        
-    await interaction.reply({ embeds: [exampleEmbed]});
-    let message = await interaction.fetchReply();
     
+    // why does this break sometimes but not other times
+    let message = await msg.reply({ embeds: [exampleEmbed]});
+    
+    await message.react('👍');
+    await message.react('👎');
+    await message.react('✋');
+
+    return message.id; //message ID
+}
+
+// aaaaaaa i hate this but it works
+async function postVote2(vote, interaction) {
+    const exampleEmbed = new MessageEmbed()
+                        .setColor('#ffff00')
+                        .setTitle(vote.name)
+                        .setDescription(vote.description)
+                        // do better here with the endtype printout
+                        .addFields(
+                            { name: 'Ends at:', value: String(vote.endTime) },
+                        )
+                        .setTimestamp();
+    
+    // why does this break sometimes but not other times
+    interaction.reply({ embeds: [exampleEmbed]});
+    let message = await interaction.fetchReply();
+
     await message.react('👍');
     await message.react('👎');
     await message.react('✋');
@@ -180,6 +230,10 @@ function endVote(i, bot) {
         }
 
         msg.edit({embeds: [exampleEmbed]});
+
+        // it be broken
+        const app = require('../application.js');
+        app.updateFromVote(vote.appID, yesVote>=noVote);
       });
 
       votes.votes.splice(i--, 1);

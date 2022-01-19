@@ -6,6 +6,7 @@ const { google } = require("googleapis");
 
 const service = google.sheets("v4");
 const credentials = require("./credentials.json");
+const voting = require('./commands/vote.js');
 
 // Runs in the background checking for new applications every x mintues
 function checkForApps(bot) {
@@ -61,11 +62,6 @@ function checkForApps(bot) {
                     spreadsheetId: config.spreadsheetID,
                     range: "A:D", // determines the colums to grab
                 });
-            
-                // All of the answers
-                const answers = [];
-        
-                // Set rows to equal the rows
                 const rows = res.data.values;
             
                 // Check if we have any data and if we do add it to our answers array
@@ -102,7 +98,7 @@ function checkForApps(bot) {
                 process.exit(1);
             }    
         })();
-    }, minutes * 60 * 1000); // remember to change this back later :)  
+    }, minutes * 10 * 1000); // remember to change this back later :)  
 }
 
 // Creates JS object
@@ -151,13 +147,8 @@ function getApplicationIndexFromID(id) {
     }
 }
 
-// Creates the vote using linking and the app object
-function createApplicationVote() {
-
-}
-
 // Confirms membership for an incoming applicant
-function confirmMembership() {
+function confirmMembership(id) {
 
 }
 
@@ -176,7 +167,7 @@ function getAppChannel() {
 function getAppNameFromID(id) {
     let data = fs.readFileSync('appdata.json');
     let appConf = JSON.parse(data);
-    return appConf.applications[getApplicationIndexFromID(id)].applicant;
+    return appConf.applications[getApplicationIndexFromID(id)].applicant; // noooo this breaks
 }
 
 function appExists(id) {
@@ -195,6 +186,7 @@ function handleReaction(reaction, user) {
         case (appConf.confirmEmote):
             let c1 = '';
             let c2 = ''; 
+            reaction.message.react(appConf.voteEmote);
             reaction.message.guild.channels.create(getAppNameFromID(reaction.message.id) + "-application" ).then( channel => {
                 channel.setParent(getAppCategory());
                 reaction.message.guild.channels.create(getAppNameFromID(reaction.message.id) + "-discussion" ).then( channel2 => {
@@ -206,7 +198,7 @@ function handleReaction(reaction, user) {
         
         // Create application vote
         case (appConf.voteEmote):
-
+            voting.saveApplicationVote(getAppNameFromID(reaction.message.id), " thing ", reaction.message);
             break;
         
         // Approve for archive and membership
@@ -221,4 +213,17 @@ function handleReaction(reaction, user) {
     }
 }
 
-module.exports = { checkForApps, appExists, handleReaction };
+function updateFromVote(id, passed) {
+    let vote = getAppNameFromID(id);
+    if(passed) {
+        confirmMembership(id);
+    } else {
+        cleanup(id);
+    }
+}
+
+function cleanup(id) {
+
+}
+
+module.exports = { checkForApps, appExists, handleReaction, updateFromVote };
