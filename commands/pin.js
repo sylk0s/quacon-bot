@@ -5,7 +5,8 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('pin')
 		.setDescription('Pins the message with the given message id')
-		.addStringOption(option => option.setName('message_id').setDescription('Message id').setRequired(true)),
+		.addStringOption(option => option.setName('message_id').setDescription('Message id').setRequired(true))
+		.setDefaultPermission(false),
 	async execute(interaction) {
 		id = interaction.options.getString('message_id');
 		try {

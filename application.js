@@ -23,6 +23,8 @@ function checkForApps(bot) {
             voteEmote:"🇻",
             memberEmote:"🇲",
             denyEmote:"❌",
+            archiveChannel:"",
+            internRole:"",
             applications: [],
         };
 
@@ -114,7 +116,6 @@ function parseJSONToApp(appInput) {
         appChannel: "", // id for application channel
         appDiscussionChannel: "", // id for discussion channel
         endTime: "", // time application is finished
-        voteID: "", // id for the vote message - will also use as unique id for votes
     }
 }
 
@@ -148,8 +149,18 @@ function getApplicationIndexFromID(id) {
 }
 
 // Confirms membership for an incoming applicant
-function confirmMembership(id) {
-    console.log('confiming membership');
+async function confirmMembership(id, bot) {
+    let data = fs.readFileSync('appdata.json');
+    let appConf = JSON.parse(data);
+
+    let application = appConf.applications[getApplicationIndexFromID(id)];
+    let role = bot.guilds.cache.get('822581610749886505').roles.cache.get(appConf.internRole);
+    let applicant = bot.users.cache.get('520407069183180802');
+    // let applicant = bot.users.cache.find(u => u.tag === application.applicant);
+    console.log(applicant);
+
+    console.log('gave applicant the role');
+    // cleanup here, just not yet
 }
 
 function getAppCategory() {
@@ -177,7 +188,7 @@ function appExists(id) {
     return true;
 }
 
-function handleReaction(reaction, user) {
+function handleReaction(reaction, user, bot) {
     let data = fs.readFileSync('appdata.json');
     let appConf = JSON.parse(data);
 
@@ -203,27 +214,42 @@ function handleReaction(reaction, user) {
         
         // Approve for archive and membership
         case (appConf.memberEmote):
-
+            console.log('confiming membership');
+            confirmMembership(reaction.message.id, bot);
             break;
 
         // deny and wipe application record
         case (appConf.denyEmote):
-
+            cleanup(reaction.message.id, bot);
             break;
     }
 }
 
-function updateFromVote(id, passed) {
+async function updateFromVote(id, passed, bot) {
+    let data = fs.readFileSync('appdata.json');
+    let appConf = JSON.parse(data);
     let vote = getAppNameFromID(id);
     if(passed) {
-        confirmMembership(id);
-    } else {
-        cleanup(id);
+        let msg = await bot.channels.cache.get(appConf.newAppChannel).messages.fetch(id);
+        msg.react(appConf.memberEmote);
     }
 }
 
-function cleanup(id) {
+// an alternate idea here would be to edit the og message and link to the message archive
+// end and save the app at any point
+// fix early exit btw
+async function cleanup(id, bot) {
     console.log('cleaning up');
+    let data = fs.readFileSync('appdata.json');
+    let appConf = JSON.parse(data);
+    let index = getApplicationIndexFromID(id);
+    let app = appConf.applications[index];
+    // here we archive stuff later
+    await bot.channels.cache.get(appConf.newAppChannel).messages.fetch(id).then(msg =>  msg.delete());
+    await bot.channels.cache.get(app.appChannel).delete();
+    await bot.channels.cache.get(app.appDiscussionChannel).delete();
+    appConf.applications.splice(index--,1);
+    fs.writeFileSync('./appdata.json', JSON.stringify(appConf));
 }
 
 module.exports = { checkForApps, appExists, handleReaction, updateFromVote };

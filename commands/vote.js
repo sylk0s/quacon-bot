@@ -231,7 +231,7 @@ function endVote(i, bot) {
         // it be broken
         if(vote.application) {
             const app = require('../application.js');
-            app.updateFromVote(vote.appID, yesVote>=noVote);
+            app.updateFromVote(vote.appID, yesVote>=noVote, bot);
         }
       });
 

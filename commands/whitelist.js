@@ -336,3 +336,7 @@ function error(message, interaction) {
 			.setDescription(message);
 	interaction.reply({ embeds: [embed] });
 }
+
+function getPerms() {
+	return 
+}
