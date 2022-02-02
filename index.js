@@ -52,7 +52,12 @@ bot.on('ready', async () => {
 	});
 
 	// no perms:
-	// mcinfo, ping 
+	// mcinfo, ping
+
+	// pin for a2+
+	// general roles for a2+, secondary for K0 and M5
+	// voting for A2+
+	// whitelist for S7, M5, E9, K0
 
 	const command_pin = await guild?.commands.fetch(findIdOfElementWithName(bot.commandMap, 'pin'));
 	const command_vote = await guild?.commands.fetch(findIdOfElementWithName(bot.commandMap, 'vote'));

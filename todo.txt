@@ -1,0 +1,20 @@
+Before putting the bot on the box:
+-test role assignment in discord
+-finalize all command permissions
+
+For application process:
+-Finalize main app process
+-Channel save functions
+-CV Gen
+
+Misc:
+-voting threads?
+-app threads?
+-move accounts to QC gmail
+-Server Status
+
+Server
+-setup basic chatbridge functionality
+-explore docker v tmux
+-websockets
+-reimplement everything from hyp-core
