@@ -7,7 +7,7 @@ module.exports = {
 		.addRoleOption(option => option.setName('role').setRequired(true))
         .addUserOption(option => option.setName('target').setDescription("Person to give the role.")),
 	async execute(interaction) {
-        interaction.options.getUser('target');
+        let target = interaction.options.getUser('target');
 		switch (interaction.options.getRole('role').id) {
             case ('3'): // consultant
                 // add role A1
