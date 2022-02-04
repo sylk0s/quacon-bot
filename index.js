@@ -120,4 +120,4 @@ function findIdOfElementWithName(list, name) {
 bot.login(config.token);
 
 //app.checkForApps(bot);
-//voteHandler.queryVotes(bot);
+voteHandler.queryVotes(bot);

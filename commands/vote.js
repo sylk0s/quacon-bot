@@ -182,9 +182,9 @@ async function postVote2(vote, interaction) {
 
 // this is bad but it wrote it this way so the vote command is decoupled from the logic
 function queryVotes(bot) {
-    console.log("starting vote query")
+    // console.log("starting vote query")
     setInterval(function() {
-        console.log('i am checking the votes');
+        // console.log('i am checking the votes');
         let data = fs.readFileSync('votes.json');
         let votes = JSON.parse(data);
         let toDelete = [];
