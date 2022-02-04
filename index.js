@@ -59,31 +59,46 @@ bot.on('ready', async () => {
 
 	// this sets up the basic permissions for commands
 
-	const command_pin = await guild?.commands.fetch(findIdOfElementWithName(bot.commandMap, 'pin'));
-	const command_vote = await guild?.commands.fetch(findIdOfElementWithName(bot.commandMap, 'vote'));
-	const command_whitelist = await guild?.commands.fetch(findIdOfElementWithName(bot.commandMap, 'whitelist'));
-	const command_role = await guild?.commands.fetch(findIdOfElementWithName(bot.commandMap, 'role'));
-
 	const member_permissions = [
+		// A2
 		{
-			id: '933515698779611196',
+			id: '927003157538693180',
 			type: 'ROLE',
 			permission: true,
 		},
 	];	
 
 	const leadership_permissions = [
+		// K0
 		{
-			id: '933515698779611196',
-			type: 'USER',
-			permission: false,
+			id: '926404073102659605',
+			type: 'ROLE',
+			permission: true,
+		},
+		// E9
+		{
+			id: '927074637937000498',
+			type: 'ROLE',
+			permission: true,
+		},
+		// S7
+		{
+			id: '927074325826248724',
+			type: 'ROLE',
+			permission: true,
+		},
+		// M5
+		{
+			id: '926412876015607840',
+			type: 'ROLE',
+			permission: true,
 		},
 	];
 
-	// await command_pin.permissions.add({ member_permissions });
-	// await command_vote.permissions.add({ member_permissions });
-	// await command_whitelist.permissions.add({ leadership_permissions });
-	// await command_role.permissions.add({ member_permissions });
+	await guild?.commands.permissions.add({command: findIdOfElementWithName(bot.commandMap, 'pin'), permissions: member_permissions });
+	await guild?.commands.permissions.add({command: findIdOfElementWithName(bot.commandMap, 'vote'), permissions: leadership_permissions });
+	await guild?.commands.permissions.add({command: findIdOfElementWithName(bot.commandMap, 'whitelist'), permissions: leadership_permissions });
+	await guild?.commands.permissions.add({command: findIdOfElementWithName(bot.commandMap, 'role'), permissions: member_permissions });
 })
 
 function mapIDtoName(command) {

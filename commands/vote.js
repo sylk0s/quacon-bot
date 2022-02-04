@@ -1,11 +1,13 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const fs = require('fs');
 const { MessageEmbed } = require('discord.js');
+const { channel } = require('diagnostics_channel');
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('vote')
 		.setDescription('Control the votes')
+        .setDefaultPermission(false)
         .addSubcommand(subcommand => subcommand
 			.setName("create")
 			.setDescription("Create a new vote")
@@ -141,6 +143,11 @@ async function postVote(vote, msg) {
     await message.react('👎');
     await message.react('✋');
 
+    await msg.channel.threads.create({
+        name: vote.name,
+        autoArchiveDuration: 60*vote.hours,
+    });
+
     return message.id; //message ID
 }
 
@@ -163,6 +170,12 @@ async function postVote2(vote, interaction) {
     await message.react('👍');
     await message.react('👎');
     await message.react('✋');
+
+    // conscious decision here to leave this after vote delete, that way any discussion of why a vote should be canceled is saved
+    await interaction.channel.threads.create({
+        name: vote.name,
+        autoArchiveDuration: 60*vote.hours,
+    });
 
     return message.id; //message ID
 }

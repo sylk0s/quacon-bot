@@ -25,10 +25,10 @@ TODO:
 
 IN PROGRESS:
 -Applications
--Voting
 -Whitelist
 
 FINSIHED FEATURES:
 -Pin 
 -User_Info
 -Roles
+-Voting?
