@@ -18,3 +18,17 @@ Server
 -explore docker v tmux
 -websockets
 -reimplement everything from hyp-core
+
+TODO:
+-More Mojank API
+-Member content
+
+IN PROGRESS:
+-Applications
+-Voting
+-Whitelist
+
+FINSIHED FEATURES:
+-Pin 
+-User_Info
+-Roles

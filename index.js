@@ -1,5 +1,5 @@
 const fs = require('fs');
-const { Client, Collection, Intents, ReactionCollector, CommandInteractionOptionResolver, SystemChannelFlags } = require('discord.js');
+const { Client, Collection, Intents } = require('discord.js');
 const config = require('./config.json');
 const app = require('./application.js');
 const voteHandler = require('./commands/vote.js')
@@ -22,8 +22,6 @@ bot.on('interactionCreate', async interaction => {
 	if (!interaction.isCommand()) return;
 
 	const command = bot.commands.get(interaction.commandName);
-
-	console.log(interaction.commandId);
 
 	if (!command) return;
 
@@ -59,11 +57,14 @@ bot.on('ready', async () => {
 	// voting for A2+
 	// whitelist for S7, M5, E9, K0
 
+	// this sets up the basic permissions for commands
+
 	const command_pin = await guild?.commands.fetch(findIdOfElementWithName(bot.commandMap, 'pin'));
 	const command_vote = await guild?.commands.fetch(findIdOfElementWithName(bot.commandMap, 'vote'));
 	const command_whitelist = await guild?.commands.fetch(findIdOfElementWithName(bot.commandMap, 'whitelist'));
+	const command_role = await guild?.commands.fetch(findIdOfElementWithName(bot.commandMap, 'role'));
 
-	const pin_permissions = [
+	const member_permissions = [
 		{
 			id: '933515698779611196',
 			type: 'ROLE',
@@ -71,7 +72,7 @@ bot.on('ready', async () => {
 		},
 	];	
 
-	const vote_permissions = [
+	const leadership_permissions = [
 		{
 			id: '933515698779611196',
 			type: 'USER',
@@ -79,8 +80,10 @@ bot.on('ready', async () => {
 		},
 	];
 
-	await command_pin.permissions.add({ pin_permissions });
-	// await command_vote.permissions.add({ vote_permissions });
+	// await command_pin.permissions.add({ member_permissions });
+	// await command_vote.permissions.add({ member_permissions });
+	// await command_whitelist.permissions.add({ leadership_permissions });
+	// await command_role.permissions.add({ member_permissions });
 })
 
 function mapIDtoName(command) {
@@ -101,5 +104,5 @@ function findIdOfElementWithName(list, name) {
 
 bot.login(config.token);
 
-app.checkForApps(bot);
-voteHandler.queryVotes(bot);
+//app.checkForApps(bot);
+//voteHandler.queryVotes(bot);

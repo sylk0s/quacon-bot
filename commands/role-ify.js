@@ -4,32 +4,60 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('give')
 		.setDescription('Gives a role to a user')
-		.addRoleOption(option => option.setName('role').setRequired(true))
-        .addUserOption(option => option.setName('target').setDescription("Person to give the role.")),
+        .addUserOption(option => option.setName('target').setDescription("Person to give the role.").setRequired(true))
+		.addRoleOption(option => option.setName('role').setDescription('desc').setRequired(true)),
 	async execute(interaction) {
         let target = interaction.options.getUser('target');
+        let guild_member = interaction.guild.members.cache.get(target.id);
 		switch (interaction.options.getRole('role').id) {
-            case ('3'): // consultant
+            case ('927073120949526538'): // consultant
                 // add role A1
+                interaction.reply('Applied consultant roles to user');
+                guild_member.roles.add(interaction.options.getRole('role'));
+                // A1
+                guild_member.roles.add(interaction.guild.roles.cache.get('927002947429236746'));
                 break;
             default:
-                if (interaction.options.getAuthor()) { // has role permissions
+                if (interaction.member.roles.cache.has('926404073102659605')) { // has role permissions
                     switch (interaction.options.getRole('role').id) {
-                        case ('1'): // intern
-                            // add roles A1, A2, P1
+                        case ('926408416275071016'): // intern
+                            interaction.reply('Applied intern roles to user');
+                            guild_member.roles.add(interaction.options.getRole('role'));
+                            // A1
+                            guild_member.roles.add(interaction.guild.roles.cache.get('927002947429236746'));
+                            // A2
+                            guild_member.roles.add(interaction.guild.roles.cache.get('927003157538693180'));
+                            // P1
+                            guild_member.roles.add(interaction.guild.roles.cache.get('927074564477972501'));
                             sendEmbed();
                             break;
-                        case ('2'): // employee
-                            // add roles A1, A2, A3, P1, P5?
+                        case ('926407841609289748'): // employee
+                            interaction.reply('Applied employee roles to user');
+                            guild_member.roles.add(interaction.options.getRole('role'));
+                            // A1
+                            guild_member.roles.add(interaction.guild.roles.cache.get('927002947429236746'));
+                            // A2
+                            guild_member.roles.add(interaction.guild.roles.cache.get('927003157538693180'));
+                            // A3
+                            guild_member.roles.add(interaction.guild.roles.cache.get('927003226493034517'));
+                            // P1
+                            guild_member.roles.add(interaction.guild.roles.cache.get('927074564477972501'));
                             break;
-                        case ('4'): // contractor
-                            // add role A1, A2, P1
+                        case ('926408493160890428'): // contractor
+                            interaction.reply('Applied contractor roles to user');
+                            guild_member.roles.add(interaction.options.getRole('role'));
+                            // A1
+                            guild_member.roles.add(interaction.guild.roles.cache.get('927002947429236746'));
+                            // A2
+                            guild_member.roles.add(interaction.guild.roles.cache.get('927003157538693180'));
+                            // P1
+                            guild_member.roles.add(interaction.guild.roles.cache.get('927074564477972501'));
                             break;
                     }
-                } 
-                interaction.reply('Error, role not approved');
+                } else {
+                    interaction.reply('Error, role not approved');
+                }
         }
-
 	}
 };
 
