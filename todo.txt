@@ -1,14 +1,9 @@
-Before putting the bot on the box:
--test role assignment in discord
--finalize all command permissions
-
 For application process:
 -Finalize main app process
 -Channel save functions
 -CV Gen
 
 Misc:
--voting threads?
 -app threads?
 -move accounts to QC gmail
 -Server Status
@@ -26,9 +21,10 @@ TODO:
 IN PROGRESS:
 -Applications
 -Whitelist
+-CONFIGIFY MORE
 
 FINSIHED FEATURES:
 -Pin 
 -User_Info
 -Roles
--Voting?
+-Voting? - maybe fix up perms on this l8r
