@@ -24,11 +24,11 @@ module.exports = {
                         // }
 
                         // took out the past names thing because deadnames
-                        
+
                         const exampleEmbed = new MessageEmbed()
                         .setColor('#55ff55')
                         .setTitle(res[0].name)
-                        .setDescription(string)
+                        // .setDescription(string)
                         .setThumbnail("https://crafatar.com/avatars/" + res[0].id)
                         .addFields(
                             { name: 'UUID', value: res[0].id },
