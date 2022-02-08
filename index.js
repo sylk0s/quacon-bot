@@ -33,10 +33,11 @@ bot.on('interactionCreate', async interaction => {
 	}
 });
 
+// temporarily disabled apps
 bot.on('messageReactionAdd', async (reaction, user) => {
-	if (!user.bot && app.appExists(reaction.message.id)) {
-		app.handleReaction(reaction, user, bot);
-	}
+	// if (!user.bot && app.appExists(reaction.message.id)) {
+	// 	app.handleReaction(reaction, user, bot);
+	// }
 });
 
 bot.on('ready', async () => {

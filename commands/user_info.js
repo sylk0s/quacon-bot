@@ -18,10 +18,13 @@ module.exports = {
                     if(err2)
                         console.log(err2)
                     else {
-                        let string = ""
-                        for (let i = 0; i < res2.length; i++) {
-                            string += res2[i].name + "\n"
-                        }
+                        // let string = ""
+                        // for (let i = 0; i < res2.length; i++) {
+                        //    string += res2[i].name + "\n"
+                        // }
+
+                        // took out the past names thing because deadnames
+                        
                         const exampleEmbed = new MessageEmbed()
                         .setColor('#55ff55')
                         .setTitle(res[0].name)
