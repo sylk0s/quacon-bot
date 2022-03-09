@@ -3,6 +3,10 @@ const { Client, Collection, Intents } = require('discord.js');
 const config = require('./config.json');
 // const app = require('./application.js');
 const voteHandler = require('./commands/vote.js')
+// for communication with rust app
+const WebSocket = require('ws')
+// example ws config value: "ws://192.168.1.0:7500/taurus"
+const wsconnection = new WebSocket(config.ws)
 
 const bot = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MEMBERS] });
 
@@ -10,6 +14,13 @@ bot.commands = new Collection();
 bot.apps1 = [];
 
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+
+// listen on websocket server for taurus
+wsconnection.onmessage = (e) => {
+	if (e.data.length < 5) { return; }
+	let message = e.data.slice(4);
+	bot.channels.cache.get(config.chatbridgeid).send(message);
+}
 
 for (const file of commandFiles) {
 	const command = require(`./commands/${file}`);
@@ -39,6 +50,12 @@ bot.on('messageReactionAdd', async (reaction, user) => {
 	// 	app.handleReaction(reaction, user, bot);
 	// }
 });
+
+bot.on('messageCreate', msg => {
+	if (msg.channel.id === config.chatbridgeid && msg.author.id != bot.user.id) {
+		wsconnection.send(`MSG [§5${msg.author.username}§f] ${msg.content}`);
+	}
+})
 
 bot.on('ready', async () => {
 
