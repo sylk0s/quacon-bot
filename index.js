@@ -7,9 +7,9 @@ const voteHandler = require('./commands/vote.js')
 const WebSocket = require('ws')
 // example ws config value: "ws://192.168.1.0:7500/taurus"
 const wsconnection = new WebSocket(config.ws)
-bot.wsconnection = wsconnection; // don't know if this is actually needed
 const bot = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MEMBERS] });
 
+bot.wsconnection = wsconnection; // don't know if this is actually needed
 bot.commands = new Collection();
 bot.apps1 = [];
 
