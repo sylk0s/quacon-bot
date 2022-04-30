@@ -26,7 +26,7 @@ module.exports = {
             .setName("force")
             .setDescription("Force a vote to end")
             .addStringOption(option => option.setName('vote').setDescription('Name of the vote to force').setRequired(true))),
-	async execute(interaction) {
+	async execute(interaction, bot) {
 
         let data = fs.readFileSync('votes.json');
         let votes = JSON.parse(data);

@@ -7,7 +7,7 @@ const voteHandler = require('./commands/vote.js')
 const WebSocket = require('ws')
 // example ws config value: "ws://192.168.1.0:7500/taurus"
 const wsconnection = new WebSocket(config.ws)
-
+bot.wsconnection = wsconnection; // don't know if this is actually needed
 const bot = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MEMBERS] });
 
 bot.commands = new Collection();
@@ -37,7 +37,7 @@ bot.on('interactionCreate', async interaction => {
 	if (!command) return;
 
 	try {
-		await command.execute(interaction);
+		await command.execute(interaction, bot);
 	} catch (error) {
 		console.error(error);
 		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
@@ -117,6 +117,7 @@ bot.on('ready', async () => {
 	await guild?.commands.permissions.add({command: findIdOfElementWithName(bot.commandMap, 'vote'), permissions: leadership_permissions });
 	await guild?.commands.permissions.add({command: findIdOfElementWithName(bot.commandMap, 'whitelist'), permissions: leadership_permissions });
 	await guild?.commands.permissions.add({command: findIdOfElementWithName(bot.commandMap, 'role'), permissions: member_permissions });
+	await guild?.commands.permissions.add({command: findIdOfElementWithName(bot.commandMap, 'execute'), permissions: leadership_permissions});
 })
 
 function mapIDtoName(command) {

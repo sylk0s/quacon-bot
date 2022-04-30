@@ -7,7 +7,7 @@ module.exports = {
 		.setDescription('Pins the message with the given message id')
 		.addStringOption(option => option.setName('message_id').setDescription('Message id').setRequired(true))
 		.setDefaultPermission(false),
-	async execute(interaction) {
+	async execute(interaction, bot) {
 		id = interaction.options.getString('message_id');
 		try {
 			await interaction.channel.messages.fetch(id).then(message => {	

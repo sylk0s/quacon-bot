@@ -52,7 +52,7 @@ module.exports = {
 		.setName('purge_temporary_whitelists')
 		.setDescription('Purge every temporary whitelist entry.')),
 		
-	async execute(interaction) {
+	async execute(interaction, bot) {
 		var type;
 		fs.readFile('./whitelist.json', 'utf8', (err, jsonString) => {
 			if (err) {

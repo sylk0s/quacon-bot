@@ -7,7 +7,7 @@ module.exports = {
         .addUserOption(option => option.setName('target').setDescription("Person to give the role.").setRequired(true))
 		.addRoleOption(option => option.setName('role').setDescription('desc').setRequired(true))
         .setDefaultPermission(false),
-	async execute(interaction) {
+	async execute(interaction, bot) {
         let target = interaction.options.getUser('target');
         let guild_member = interaction.guild.members.cache.get(target.id);
 		switch (interaction.options.getRole('role').id) {
@@ -16,7 +16,7 @@ module.exports = {
 
             case ('927073120949526538'): // consultant
                 // add role A1
-                interaction.reply('Applied consultant roles to user');
+                interaction.reply('Applied consultant roles to ' + guild_member.nickname + "\nClick on the reply for more info");
                 guild_member.roles.add(interaction.options.getRole('role'));
                 // A1
                 guild_member.roles.add(interaction.guild.roles.cache.get('927002947429236746'));
@@ -28,7 +28,7 @@ module.exports = {
                     ) { // has role permissions
                     switch (interaction.options.getRole('role').id) {
                         case ('926408416275071016'): // intern
-                            interaction.reply('Applied intern roles to user');
+                            interaction.reply('Applied intern roles to ' + guild_member.nickname + "\nClick on the reply for more info");
                             guild_member.roles.add(interaction.options.getRole('role'));
                             // A1
                             guild_member.roles.add(interaction.guild.roles.cache.get('927002947429236746'));
@@ -39,7 +39,7 @@ module.exports = {
                             sendEmbed();
                             break;
                         case ('926407841609289748'): // employee
-                            interaction.reply('Applied employee roles to user');
+                            interaction.reply('Applied employee roles to ' + guild_member.nickname + "\nClick on the reply for more info");
                             guild_member.roles.add(interaction.options.getRole('role'));
                             // A1
                             guild_member.roles.add(interaction.guild.roles.cache.get('927002947429236746'));
@@ -51,7 +51,7 @@ module.exports = {
                             guild_member.roles.add(interaction.guild.roles.cache.get('927074564477972501'));
                             break;
                         case ('926408493160890428'): // contractor
-                            interaction.reply('Applied contractor roles to user');
+                            interaction.reply('Applied contractor roles to ' + guild_member.nickname + "\nClick on the reply for more info");
                             guild_member.roles.add(interaction.options.getRole('role'));
                             // A1
                             guild_member.roles.add(interaction.guild.roles.cache.get('927002947429236746'));

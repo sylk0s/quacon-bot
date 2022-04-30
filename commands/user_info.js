@@ -8,7 +8,7 @@ module.exports = {
         .addStringOption(
             option => option.setName('mcname').setDescription('Input a minecraft username.').setRequired(true)
         ),
-	async execute(interaction) {
+	async execute(interaction, bot) {
         var MojangAPI = require('mojang-api')
         MojangAPI.nameToUuid(interaction.options.getString('mcname'), function(err,res) {
             if(err)
