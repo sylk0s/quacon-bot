@@ -9,7 +9,7 @@ module.exports = {
         .addStringOption(option => option.setName('cmd').setDescription('The command to send to the minecraft server').setRequired(true))
 		.setDefaultPermission(false),
 	async execute(interaction, bot) {
-		let session = interaction.options.getString('session');
+		let session = interaction.options.getString('server');
         let cmd = interaction.options.getString('cmd');
         bot.wsconnection.send("CMD " + session + " " + cmd);
         interaction.reply("Sent `" + cmd + "` to server `" + session + "`");

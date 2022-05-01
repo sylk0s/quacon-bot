@@ -52,9 +52,9 @@ bot.on('messageReactionAdd', async (reaction, user) => {
 });
 
 bot.on('messageCreate', msg => {
-	//if (msg.channel.id === config.chatbridgeid && msg.author.id != bot.user.id) {
-	//	wsconnection.send(`MSG [§5${msg.author.username}§f] ${msg.content}`);
-	//}
+	if (msg.channel.id === config.chatbridgeid && msg.author.id != bot.user.id) {
+		wsconnection.send(`MSG [§5${msg.author.username}§f] ${msg.content}`);
+	}
 })
 
 bot.on('ready', async () => {
