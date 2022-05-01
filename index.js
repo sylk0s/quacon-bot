@@ -77,7 +77,9 @@ bot.on('ready', async () => {
 
 	// this sets up the basic permissions for commands
 
-	const member_permissions = [
+	// discord is stupid and took away perms to do this wtf
+
+	/*const member_permissions = [
 		// A2
 		{
 			id: '927003157538693180',
@@ -113,11 +115,12 @@ bot.on('ready', async () => {
 		},
 	];
 
-	//await guild?.commands.permissions.add({command: findIdOfElementWithName(bot.commandMap, 'pin'), permissions: member_permissions });
-	//await guild?.commands.permissions.add({command: findIdOfElementWithName(bot.commandMap, 'vote'), permissions: leadership_permissions });
-	//await guild?.commands.permissions.add({command: findIdOfElementWithName(bot.commandMap, 'whitelist'), permissions: leadership_permissions });
-	//await guild?.commands.permissions.add({command: findIdOfElementWithName(bot.commandMap, 'role'), permissions: member_permissions });
-	//await guild?.commands.permissions.add({command: findIdOfElementWithName(bot.commandMap, 'execute'), permissions: leadership_permissions});
+	await guild?.commands.permissions.add({command: findIdOfElementWithName(bot.commandMap, 'pin'), permissions: member_permissions });
+	await guild?.commands.permissions.add({command: findIdOfElementWithName(bot.commandMap, 'vote'), permissions: leadership_permissions });
+	await guild?.commands.permissions.add({command: findIdOfElementWithName(bot.commandMap, 'whitelist'), permissions: leadership_permissions });
+	await guild?.commands.permissions.add({command: findIdOfElementWithName(bot.commandMap, 'role'), permissions: member_permissions });
+	await guild?.commands.permissions.add({command: findIdOfElementWithName(bot.commandMap, 'execute'), permissions: leadership_permissions});
+	*/
 })
 
 function mapIDtoName(command) {
