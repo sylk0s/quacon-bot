@@ -52,9 +52,9 @@ bot.on('messageReactionAdd', async (reaction, user) => {
 });
 
 bot.on('messageCreate', msg => {
-	if (msg.channel.id === config.chatbridgeid && msg.author.id != bot.user.id) {
-		wsconnection.send(`MSG [§5${msg.author.username}§f] ${msg.content}`);
-	}
+	//if (msg.channel.id === config.chatbridgeid && msg.author.id != bot.user.id) {
+	//	wsconnection.send(`MSG [§5${msg.author.username}§f] ${msg.content}`);
+	//}
 })
 
 bot.on('ready', async () => {
@@ -113,11 +113,11 @@ bot.on('ready', async () => {
 		},
 	];
 
-	await guild?.commands.permissions.add({command: findIdOfElementWithName(bot.commandMap, 'pin'), permissions: member_permissions });
-	await guild?.commands.permissions.add({command: findIdOfElementWithName(bot.commandMap, 'vote'), permissions: leadership_permissions });
-	await guild?.commands.permissions.add({command: findIdOfElementWithName(bot.commandMap, 'whitelist'), permissions: leadership_permissions });
-	await guild?.commands.permissions.add({command: findIdOfElementWithName(bot.commandMap, 'role'), permissions: member_permissions });
-	await guild?.commands.permissions.add({command: findIdOfElementWithName(bot.commandMap, 'execute'), permissions: leadership_permissions});
+	//await guild?.commands.permissions.add({command: findIdOfElementWithName(bot.commandMap, 'pin'), permissions: member_permissions });
+	//await guild?.commands.permissions.add({command: findIdOfElementWithName(bot.commandMap, 'vote'), permissions: leadership_permissions });
+	//await guild?.commands.permissions.add({command: findIdOfElementWithName(bot.commandMap, 'whitelist'), permissions: leadership_permissions });
+	//await guild?.commands.permissions.add({command: findIdOfElementWithName(bot.commandMap, 'role'), permissions: member_permissions });
+	//await guild?.commands.permissions.add({command: findIdOfElementWithName(bot.commandMap, 'execute'), permissions: leadership_permissions});
 })
 
 function mapIDtoName(command) {
