@@ -7,12 +7,9 @@ Misc:
 -app threads?
 -move accounts to QC gmail
 -Server Status
-
-Server
--setup basic chatbridge functionality
--explore docker v tmux
--websockets
--reimplement everything from hyp-core
+-help
+-info
+-role info
 
 TODO:
 -More Mojank API
@@ -24,6 +21,8 @@ IN PROGRESS:
 -CONFIGIFY MORE
 
 FINSIHED FEATURES:
+-chatbridge
+-command execution
 -Pin 
 -User_Info
 -Roles
