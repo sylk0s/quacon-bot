@@ -1,31 +1,30 @@
 const fs = require('fs');
 const { Client, Collection, Intents } = require('discord.js');
-const config = require('./config.json');
-// const app = require('./application.js');
-const voteHandler = require('./commands/vote.js')
-// for communication with rust app
 const WebSocket = require('ws')
-// example ws config value: "ws://192.168.1.0:7500/taurus"
-const wsconnection = new WebSocket(config.ws)
-const bot = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MEMBERS] });
 
-bot.wsconnection = wsconnection; // don't know if this is actually needed
+const config = require('./config.json');
+const app = require('./application.js');
+const voteHandler = require('./commands/vote.js')
+
+// example ws config value: "ws://192.168.1.0:7500/taurus"
+// const wsconnection = new WebSocket(config.ws)
+
+const bot = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MEMBERS] });
+//bot.wsconnection = wsconnection; // don't know if this is actually needed
 bot.commands = new Collection();
 bot.apps1 = [];
 
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
-
+/*
 // listen on websocket server for taurus
 wsconnection.onmessage = (e) => {
 	if (e.data.length < 5) { return; }
 	let message = e.data.slice(4);
 	bot.channels.cache.get(config.chatbridgeid).send(message);
 }
-
+*/
 for (const file of commandFiles) {
 	const command = require(`./commands/${file}`);
-	// Set a new item in the Collection
-	// With the key as the command name and the value as the exported module
 	bot.commands.set(command.data.name, command);	
 }
 
@@ -46,18 +45,22 @@ bot.on('interactionCreate', async interaction => {
 
 // temporarily disabled apps
 bot.on('messageReactionAdd', async (reaction, user) => {
-	// if (!user.bot && app.appExists(reaction.message.id)) {
-	// 	app.handleReaction(reaction, user, bot);
-	// }
+	 if (!user.bot && app.appExists(reaction.message.id)) {
+	 	app.handleReaction(reaction, user, bot);
+	 }
 });
 
+/*
 bot.on('messageCreate', msg => {
 	if (msg.channel.id === config.chatbridgeid && msg.author.id != bot.user.id) {
 		wsconnection.send(`MSG [§5${msg.author.username}§f] ${msg.content}`);
 	}
 })
+*/
 
 bot.on('ready', async () => {
+
+  console.log("Bot Online");
 
 	bot.commandMap = [];
 
@@ -66,61 +69,6 @@ bot.on('ready', async () => {
 	await (await guild.commands.fetch()).forEach(command => {
 		bot.commandMap.push(mapIDtoName(command));
 	});
-
-	// no perms:
-	// mcinfo, ping
-
-	// pin for a2+
-	// general roles for a2+, secondary for K0 and M5
-	// voting for A2+
-	// whitelist for S7, M5, E9, K0
-
-	// this sets up the basic permissions for commands
-
-	// discord is stupid and took away perms to do this wtf
-
-	/*const member_permissions = [
-		// A2
-		{
-			id: '927003157538693180',
-			type: 'ROLE',
-			permission: true,
-		},
-	];	
-
-	const leadership_permissions = [
-		// K0
-		{
-			id: '926404073102659605',
-			type: 'ROLE',
-			permission: true,
-		},
-		// E9
-		{
-			id: '927074637937000498',
-			type: 'ROLE',
-			permission: true,
-		},
-		// S7
-		{
-			id: '927074325826248724',
-			type: 'ROLE',
-			permission: true,
-		},
-		// M5
-		{
-			id: '926412876015607840',
-			type: 'ROLE',
-			permission: true,
-		},
-	];
-
-	await guild?.commands.permissions.add({command: findIdOfElementWithName(bot.commandMap, 'pin'), permissions: member_permissions });
-	await guild?.commands.permissions.add({command: findIdOfElementWithName(bot.commandMap, 'vote'), permissions: leadership_permissions });
-	await guild?.commands.permissions.add({command: findIdOfElementWithName(bot.commandMap, 'whitelist'), permissions: leadership_permissions });
-	await guild?.commands.permissions.add({command: findIdOfElementWithName(bot.commandMap, 'role'), permissions: member_permissions });
-	await guild?.commands.permissions.add({command: findIdOfElementWithName(bot.commandMap, 'execute'), permissions: leadership_permissions});
-	*/
 })
 
 function mapIDtoName(command) {
@@ -141,5 +89,5 @@ function findIdOfElementWithName(list, name) {
 
 bot.login(config.token);
 
-//app.checkForApps(bot);
+app.checkForApps(bot);
 voteHandler.queryVotes(bot);

@@ -1,28 +1,26 @@
 const fs = require('fs');
 const fsp = require('fs').promises;
 const config = require('./config.json');
-
 const { google } = require("googleapis");
-
 const service = google.sheets("v4");
 const credentials = require("./credentials.json");
 const voting = require('./commands/vote.js');
 
+const confirmEmote="✅";
+const voteEmote="🇻";   
+const memberEmote="🇲";
+const denyEmote="❌";   
+
 // Runs in the background checking for new applications every x mintues
 function checkForApps(bot) {
     console.log('Checking for apps now')
-    if (fs.existsSync('./appdata.json')) {
-        // aaa
-    } else {
+    if (!fs.existsSync('./appdata.json')) {
+
         // stupid issue storing emojis in json bruh
         let appdata = {
             checked: 0,
             appCategory:'',
             newAppChannel:'',
-            confirmEmote:"✅",
-            voteEmote:"🇻",
-            memberEmote:"🇲",
-            denyEmote:"❌",
             archiveChannel:"",
             internRole:"",
             applications: [],
@@ -76,12 +74,24 @@ function checkForApps(bot) {
                     let executed = 0;
                     for (let i = appdata.checked; i < rows.length; i++) {
                         executed++;
+														
+												const appChannel = await bot.channels.cache.get('933431313405452390'); // using temp channel id
+
                         const message = await bot.channels.cache.get(getAppChannel()).send('Detected ' + rows[i][1])
-                        await message.react(appdata.confirmEmote);
-                        await message.react(appdata.denyEmote);
+												const thread = await appChannel.threads.create({
+															name: rows[i][1] + '-discussion',
+															autoArchiveDuration:10080, // 1wk archive time
+															reason: 'Private conversation about an applicant',
+												});
+
+                        await message.react(confirmEmote);
+                        await message.react(denyEmote);
+
                         let app = parseJSONToApp(rows[i]);
                         app.messageID = message.id;
+												app.thread = thread.id
                         appdata.applications.push(app);
+
                         if (i == rows.length-1) {
                             appdata.checked += executed;
                             fs.writeFileSync('./appdata.json', JSON.stringify(appdata));
@@ -125,15 +135,14 @@ function parseJSONToImage(appInput) {
 }
 
 // Approves application for useage
-function approveApplication(id, c1, c2, confirmedBy) {
+function approveApplication(id, c, confirmedBy) {
     let index = getApplicationIndexFromID(id);
     let data = fs.readFileSync('appdata.json');
     let apps = JSON.parse(data);
     let app = apps.applications[index];
     app.confirmedBy = confirmedBy;
     app.confirmed = true;
-    app.appChannel = c1;
-    app.appDiscussionChannel = c2;
+    app.appChannel = c;
     fs.writeFileSync('./appdata.json', JSON.stringify(apps));
 }
 
@@ -188,38 +197,38 @@ function appExists(id) {
     return true;
 }
 
-function handleReaction(reaction, user, bot) {
+async function handleReaction(reaction, user, bot) {
     let data = fs.readFileSync('appdata.json');
     let appConf = JSON.parse(data);
 
     switch(reaction.emoji.name) {
         // Approve initial application
-        case (appConf.confirmEmote):
-            let c1 = '';
-            let c2 = ''; 
-            reaction.message.react(appConf.voteEmote);
+        case (confirmEmote):
+				    const name = getAppNameFromID(reaction.message.id) 
+            
+				    reaction.message.react(voteEmote);
+						
+				    const appChannel = await bot.channels.cache.get('933431313405452390'); // using temp channel id
+
             reaction.message.guild.channels.create(getAppNameFromID(reaction.message.id) + "-application" ).then( channel => {
                 channel.setParent(getAppCategory());
-                reaction.message.guild.channels.create(getAppNameFromID(reaction.message.id) + "-discussion" ).then( channel2 => {
-                    channel2.setParent(getAppCategory());
-                    approveApplication(reaction.message.id, channel.id, channel2.id, user.id);
-                });
+								approveApplication(reaction.message.id, channel.id, user.id);
             });
             break;
         
         // Create application vote
-        case (appConf.voteEmote):
+        case (voteEmote):
             voting.saveApplicationVote(getAppNameFromID(reaction.message.id), " thing ", reaction.message);
             break;
         
         // Approve for archive and membership
-        case (appConf.memberEmote):
+        case (memberEmote):
             console.log('confiming membership');
             confirmMembership(reaction.message.id, bot);
             break;
 
         // deny and wipe application record
-        case (appConf.denyEmote):
+        case (denyEmote):
             cleanup(reaction.message.id, bot);
             break;
     }
@@ -231,7 +240,7 @@ async function updateFromVote(id, passed, bot) {
     let vote = getAppNameFromID(id);
     if(passed) {
         let msg = await bot.channels.cache.get(appConf.newAppChannel).messages.fetch(id);
-        msg.react(appConf.memberEmote);
+        msg.react(memberEmote);
     }
 }
 
@@ -247,7 +256,7 @@ async function cleanup(id, bot) {
     // here we archive stuff later
     await bot.channels.cache.get(appConf.newAppChannel).messages.fetch(id).then(msg =>  msg.delete());
     await bot.channels.cache.get(app.appChannel).delete();
-    await bot.channels.cache.get(app.appDiscussionChannel).delete();
+    await bot.channels.cache.get(app.appDiscussionChannel).delete();//will need to change this
     appConf.applications.splice(index--,1);
     fs.writeFileSync('./appdata.json', JSON.stringify(appConf));
 }
