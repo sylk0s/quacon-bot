@@ -171,6 +171,7 @@ async function postVote2(vote, interaction) {
     await message.react('👎');
     await message.react('✋');
 
+    // TODO fix this so that it has different behavior if it is an application vote
     // conscious decision here to leave this after vote delete, that way any discussion of why a vote should be canceled is saved
     await interaction.channel.threads.create({
         name: vote.name,

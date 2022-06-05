@@ -11,6 +11,12 @@ const voteEmote="🇻";
 const memberEmote="🇲";
 const denyEmote="❌";   
 
+function getConf() {
+    let data = fs.readFileSync('appdata.json');
+    let apps = JSON.parse(data);
+    return apps;
+}
+
 // Runs in the background checking for new applications every x mintues
 function checkForApps(bot) {
     console.log('Checking for apps now')
@@ -47,9 +53,7 @@ function checkForApps(bot) {
         (async function () {
             try {
 
-                const string = fs.readFileSync('./appdata.json',{encoding: 'utf8', flag:'r'});
-                const appdata = JSON.parse(string);
-        
+                const conf = getConf(); 
                 // Authorize the client
                 const token = await authClient.authorize();
         
@@ -65,14 +69,14 @@ function checkForApps(bot) {
                 const rows = res.data.values;
             
                 // Check if we have any data and if we do add it to our answers array
-                if (rows.length > appdata.checked+1) {
+                if (rows.length > conf.checked+1) {
         
                     // Remove the headers
                     rows.shift();
 
                     // For each row
                     let executed = 0;
-                    for (let i = appdata.checked; i < rows.length; i++) {
+                    for (let i = conf.checked; i < rows.length; i++) {
                         executed++;
 														
 												const appChannel = await bot.channels.cache.get('933431313405452390'); // using temp channel id
@@ -89,12 +93,12 @@ function checkForApps(bot) {
 
                         let app = parseJSONToApp(rows[i]);
                         app.messageID = message.id;
-												app.thread = thread.id
-                        appdata.applications.push(app);
+		    			app.thread = thread.id
+                        conf.applications.push(app);
 
                         if (i == rows.length-1) {
-                            appdata.checked += executed;
-                            fs.writeFileSync('./appdata.json', JSON.stringify(appdata));
+                            conf.checked += executed;
+                            fs.writeFileSync('./appdata.json', JSON.stringify(conf));
                         }
                     }
                 } else {
@@ -137,21 +141,19 @@ function parseJSONToImage(appInput) {
 // Approves application for useage
 function approveApplication(id, c, confirmedBy) {
     let index = getApplicationIndexFromID(id);
-    let data = fs.readFileSync('appdata.json');
-    let apps = JSON.parse(data);
-    let app = apps.applications[index];
+    let conf = getConf();
+    let app = conf.applications[index];
     app.confirmedBy = confirmedBy;
     app.confirmed = true;
     app.appChannel = c;
-    fs.writeFileSync('./appdata.json', JSON.stringify(apps));
+    fs.writeFileSync('./appdata.json', JSON.stringify(conf));
 }
 
 // Uses message id to get the applications index from the application list
 function getApplicationIndexFromID(id) {
-    let data = fs.readFileSync('appdata.json');
-    let apps = JSON.parse(data);
-    for (let i = 0; i < apps.applications.length; i++) { //(application in apps.applications) {
-        if (apps.applications[i].messageID == id) {
+    let conf = getConf();
+    for (let i = 0; i < conf.applications.length; i++) { //(application in apps.applications) {
+        if (conf.applications[i].messageID == id) {
             return i;
         }
     }
@@ -159,11 +161,9 @@ function getApplicationIndexFromID(id) {
 
 // Confirms membership for an incoming applicant
 async function confirmMembership(id, bot) {
-    let data = fs.readFileSync('appdata.json');
-    let appConf = JSON.parse(data);
-
-    let application = appConf.applications[getApplicationIndexFromID(id)];
-    let role = bot.guilds.cache.get('822581610749886505').roles.cache.get(appConf.internRole);
+    let conf = getConf();
+    let application = conf.applications[getApplicationIndexFromID(id)];
+    let role = bot.guilds.cache.get('822581610749886505').roles.cache.get(conf.internRole);
     let applicant = bot.users.cache.get('520407069183180802');
     // let applicant = bot.users.cache.find(u => u.tag === application.applicant);
     console.log(applicant);
@@ -173,21 +173,15 @@ async function confirmMembership(id, bot) {
 }
 
 function getAppCategory() {
-    let data = fs.readFileSync('appdata.json');
-    let appConf = JSON.parse(data);
-    return appConf.appCategory;
+    return getConf().appCategory;
 }
 
 function getAppChannel() {
-    let data = fs.readFileSync('appdata.json');
-    let appConf = JSON.parse(data);
-    return appConf.newAppChannel;
+    return getConf().newAppChannel;
 }
 
 function getAppNameFromID(id) {
-    let data = fs.readFileSync('appdata.json');
-    let appConf = JSON.parse(data);
-    return appConf.applications[getApplicationIndexFromID(id)].applicant; // noooo this breaks
+    return getConf().applications[getApplicationIndexFromID(id)].applicant; // noooo this breaks
 }
 
 function appExists(id) {
@@ -198,22 +192,10 @@ function appExists(id) {
 }
 
 async function handleReaction(reaction, user, bot) {
-    let data = fs.readFileSync('appdata.json');
-    let appConf = JSON.parse(data);
-
     switch(reaction.emoji.name) {
         // Approve initial application
         case (confirmEmote):
-				    const name = getAppNameFromID(reaction.message.id) 
-            
-				    reaction.message.react(voteEmote);
-						
-				    const appChannel = await bot.channels.cache.get('933431313405452390'); // using temp channel id
-
-            reaction.message.guild.channels.create(getAppNameFromID(reaction.message.id) + "-application" ).then( channel => {
-                channel.setParent(getAppCategory());
-								approveApplication(reaction.message.id, channel.id, user.id);
-            });
+                    confirmApplicant(reaction, user, bot);
             break;
         
         // Create application vote
@@ -234,12 +216,22 @@ async function handleReaction(reaction, user, bot) {
     }
 }
 
+async function confirmApplicant(reaction, user, bot) {
+		const name = getAppNameFromID(reaction.message.id)     
+		reaction.message.react(voteEmote);
+		const appChannel = await bot.channels.cache.get('933431313405452390'); // using temp channel id
+            
+        reaction.message.guild.channels.create(getAppNameFromID(reaction.message.id) + "-application" ).then( channel => {
+                channel.setParent(getAppCategory());
+				approveApplication(reaction.message.id, channel.id, user.id);
+        });
+}
+
 async function updateFromVote(id, passed, bot) {
-    let data = fs.readFileSync('appdata.json');
-    let appConf = JSON.parse(data);
+    let conf = getConf();
     let vote = getAppNameFromID(id);
     if(passed) {
-        let msg = await bot.channels.cache.get(appConf.newAppChannel).messages.fetch(id);
+        let msg = await bot.channels.cache.get(conf.newAppChannel).messages.fetch(id);
         msg.react(memberEmote);
     }
 }
@@ -249,16 +241,15 @@ async function updateFromVote(id, passed, bot) {
 // fix early exit btw
 async function cleanup(id, bot) {
     console.log('cleaning up');
-    let data = fs.readFileSync('appdata.json');
-    let appConf = JSON.parse(data);
+    let conf = getConf();
     let index = getApplicationIndexFromID(id);
-    let app = appConf.applications[index];
+    let app = conf.applications[index];
     // here we archive stuff later
-    await bot.channels.cache.get(appConf.newAppChannel).messages.fetch(id).then(msg =>  msg.delete());
+    await bot.channels.cache.get(conf.newAppChannel).messages.fetch(id).then(msg =>  msg.delete());
     await bot.channels.cache.get(app.appChannel).delete();
     await bot.channels.cache.get(app.appDiscussionChannel).delete();//will need to change this
-    appConf.applications.splice(index--,1);
-    fs.writeFileSync('./appdata.json', JSON.stringify(appConf));
+    conf.applications.splice(index--,1);
+    fs.writeFileSync('./appdata.json', JSON.stringify(conf));
 }
 
 module.exports = { checkForApps, appExists, handleReaction, updateFromVote };
