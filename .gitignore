@@ -3,3 +3,6 @@ node_modules
 credentials.json
 answers.json
 appdata.json
+votes.json
+whitelist_config.json
+whitelist.json

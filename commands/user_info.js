@@ -8,7 +8,7 @@ module.exports = {
         .addStringOption(
             option => option.setName('mcname').setDescription('Input a minecraft username.').setRequired(true)
         ),
-	async execute(interaction) {
+	async execute(interaction, bot) {
         var MojangAPI = require('mojang-api')
         MojangAPI.nameToUuid(interaction.options.getString('mcname'), function(err,res) {
             if(err)
@@ -18,14 +18,17 @@ module.exports = {
                     if(err2)
                         console.log(err2)
                     else {
-                        let string = ""
-                        for (let i = 0; i < res2.length; i++) {
-                            string += res2[i].name + "\n"
-                        }
+                        // let string = ""
+                        // for (let i = 0; i < res2.length; i++) {
+                        //    string += res2[i].name + "\n"
+                        // }
+
+                        // took out the past names thing because deadnames
+
                         const exampleEmbed = new MessageEmbed()
                         .setColor('#55ff55')
                         .setTitle(res[0].name)
-                        .setDescription(string)
+                        // .setDescription(string)
                         .setThumbnail("https://crafatar.com/avatars/" + res[0].id)
                         .addFields(
                             { name: 'UUID', value: res[0].id },

@@ -1,0 +1,29 @@
+For application process:
+-Finalize main app process
+-Channel save functions
+-CV Gen
+
+Misc:
+-app threads?
+-move accounts to QC gmail
+-Server Status
+-help
+-info
+-role info
+
+TODO:
+-More Mojank API
+-Member content
+
+IN PROGRESS:
+-Applications
+-Whitelist
+-CONFIGIFY MORE
+
+FINSIHED FEATURES:
+-chatbridge
+-command execution
+-Pin 
+-User_Info
+-Roles
+-Voting? - maybe fix up perms on this l8r

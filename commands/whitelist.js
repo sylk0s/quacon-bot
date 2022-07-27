@@ -11,6 +11,7 @@ module.exports = {
 	data: new SlashCommandBuilder()
 	.setName("whitelist")
 	.setDescription("Manage the whitelist")
+	.setDefaultPermission(false)
 	.addSubcommand(subcommand =>
 		subcommand
 		.setName("add")
