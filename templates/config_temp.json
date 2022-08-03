@@ -1,6 +1,9 @@
 {
-    "token":"",
-    "spreadsheetID":"",
-    "guildId":"",
-    "clientId":""
+  "token":"",
+  "spreadsheetID":"",
+  "guildId":"",
+  "clientId":"",
+  "chatbridgeid":"",
+  "ws":"",
+  "wsPassword":""
 }
