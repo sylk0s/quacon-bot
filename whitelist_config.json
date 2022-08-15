@@ -11,8 +11,8 @@
         "names": ["cmp2", "creative2"],
         "op": true
     },
-    "copy": {
-        "names": ["copy", "smpcopy", "survivalcopy"],
+    "mirror": {
+        "names": ["copy", "smpcopy", "survivalcopy", "mirror"],
         "op": true
     }
 }
