@@ -10,10 +10,10 @@
   "license": "MIT",
   "dependencies": {
     "@discordjs/builders": "^0.11.0",
-    "@discordjs/rest": "^0.2.0-canary.0",
+    "@discordjs/rest": "^1.0.1",
     "add-dashes-to-uuid": "^1.0.0",
     "discord-api-types": "^0.26.1",
-    "discord.js": "^13.5.0",
+    "discord.js": "^14.1.2",
     "googleapis": "^92.0.0",
     "mojang-api": "^0.0.2",
     "ws": "^8.5.0",
