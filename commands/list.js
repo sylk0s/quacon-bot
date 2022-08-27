@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 const { listenForResponseWithType } = require('../taurus.js');
 
 module.exports = {
@@ -14,10 +14,10 @@ module.exports = {
 			const value = reply.toString();
 			const sliced = value.slice(5).replace(":", ": ");
 			console.log(sliced)
-			let embed = new MessageEmbed()
+			let embed = new EmbedBuilder()
 				.setTitle("list :pencil:")
 				.setDescription(sliced);
-			interaction.reply(embed);
+			interaction.reply({embeds: [embed]});
 		} else {
 			interaction.reply("failed to recieve reply from taurus");
 		}
