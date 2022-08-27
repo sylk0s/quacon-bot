@@ -14,7 +14,7 @@ module.exports = {
 			const value = reply.toString();
 			const sliced = value.slice(5).replace(":", ": ");
 			console.log(sliced)
-			let embed = new Discord.MessageEmbed()
+			let embed = new MessageEmbed()
 				.setTitle("list :pencil:")
 				.setDescription(sliced);
 			interaction.reply(embed);
