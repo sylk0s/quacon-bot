@@ -55,7 +55,7 @@ function init(bot) {
 	wsconnection.send(config.wsPassword);
 	console.log("authenticating...")
 	wsconnection.send("PING");
-	await listenForResponseWithType("PONG");
+	await listenForResponseWithType(bot, "PONG");
   }
 }
 
