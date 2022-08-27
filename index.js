@@ -10,6 +10,7 @@ const bot = new Client({ intents: [GatewayIntentBits.Guilds] });
 bot.commands = new Collection();
 bot.apps1 = [];
 bot.messageCache = [];
+bot.wsconnection=taurus.wsconnection
 
 taurus.init(bot);
 

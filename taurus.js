@@ -59,4 +59,4 @@ function init(bot) {
   }
 }
 
-module.exports = { init, listenForResponseWithType };
+module.exports = { init, listenForResponseWithType, wsconnection };
