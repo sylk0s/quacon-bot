@@ -15,8 +15,8 @@
     "discord-api-types": "^0.26.1",
     "discord.js": "^14.1.2",
     "googleapis": "^92.0.0",
+    "jira-client": "^8.0.0",
     "mojang-api": "^0.0.2",
-    "ws": "^8.5.0",
-    "jira-client": "^8.0.0"
+    "ws": "^8.5.0"
   }
 }

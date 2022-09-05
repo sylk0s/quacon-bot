@@ -6,13 +6,13 @@ const config = require('./config.json');
 const voteHandler = require('./commands/vote.js');
 const taurus = require('./taurus.js');
 
-const bot = new Client({ intents: [GatewayIntentBits.Guilds] });
+const bot = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
 bot.commands = new Collection();
 bot.apps1 = [];
 bot.messageCache = [];
-bot.wsconnection=taurus.wsconnection
 
 taurus.init(bot);
+bot.wsconnection=taurus.wsconnection
 
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
