@@ -10,6 +10,7 @@ const bot = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.G
 bot.commands = new Collection();
 bot.apps1 = [];
 bot.messageCache = [];
+bot.cinchgames = [];
 
 taurus.init(bot);
 bot.wsconnection=taurus.wsconnection
@@ -37,13 +38,17 @@ bot.on('interactionCreate', async interaction => {
 });
 
 // temporarily disabled apps
-/*
+
 bot.on('messageReactionAdd', async (reaction, user) => {
-	 if (!user.bot && app.appExists(reaction.message.id)) {
+	/* 
+	if (!user.bot && app.appExists(reaction.message.id)) {
 	 	app.handleReaction(reaction, user, bot);
 	 }
+	 */
+	// need to add some handler here for the init message and then subsequent messages
+
 });
-*/
+
 
 bot.on('messageCreate', msg => {
 	if (msg.channel.id !== config.chatbridgeid || msg.author.id == bot.user.id) return;
