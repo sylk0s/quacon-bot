@@ -11,6 +11,7 @@ bot.commands = new Collection();
 bot.apps1 = [];
 bot.messageCache = [];
 bot.cinchgames = [];
+bot.cachedembed = null;
 
 taurus.init(bot);
 bot.wsconnection=taurus.wsconnection
