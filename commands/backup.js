@@ -89,7 +89,3 @@ module.exports = {
     // }
   },
 };
-<<<<<<< HEAD
-=======
-
->>>>>>> 3f4556a (working state with backups)

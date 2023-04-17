@@ -12,6 +12,7 @@ bot.apps1 = [];
 bot.messageCache = [];
 bot.cinchgames = [];
 bot.cachedembed = null;
+const cinch = require('./commands/cinch.js');
 
 taurus.init(bot);
 bot.wsconnection=taurus.wsconnection
@@ -41,15 +42,16 @@ bot.on('interactionCreate', async interaction => {
 // temporarily disabled apps
 
 bot.on('messageReactionAdd', async (reaction, user) => {
+  if ((game = bot.getCinch(reaction.message.id)) && cinch.getReactionEmotes().contains(bot.reaction.emoji)) {
+    handleReaction(bot, reaction, user);
+  }
 	/* 
 	if (!user.bot && app.appExists(reaction.message.id)) {
 	 	app.handleReaction(reaction, user, bot);
 	 }
 	 */
 	// need to add some handler here for the init message and then subsequent messages
-
 });
-
 
 bot.on('messageCreate', msg => {
 	if (msg.channel.id !== config.chatbridgeid || msg.author.id == bot.user.id) return;
@@ -78,7 +80,6 @@ bot.on('messageCreate', msg => {
 })
 
 bot.on('ready', async () => {
-
   console.log("Bot Online");
 
 	bot.commandMap = [];
